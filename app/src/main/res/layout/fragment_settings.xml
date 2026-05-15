@@ -252,9 +252,5 @@
             android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
             android:textColor="@color/text_secondary" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="100dp" />
-
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

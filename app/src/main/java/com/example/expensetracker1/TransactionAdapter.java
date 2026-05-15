@@ -12,6 +12,7 @@ import com.example.expensetracker1.databinding.ItemTransactionBinding;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder> {
 
@@ -47,16 +48,17 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         holder.binding.tvTransactionTitle.setText(transaction.getTitle());
         holder.binding.tvTransactionCategory.setText(transaction.getCategory());
 
-        String prefix = transaction.getType().equals("EXPENSE") ? "-" : "+";
+        boolean isExpense = Objects.equals(transaction.getType(), "EXPENSE");
+        String prefix = isExpense ? "-" : "+";
         holder.binding.tvTransactionAmount.setText(prefix + String.format(Locale.getDefault(), "%,.0fđ", transaction.getAmount()));
 
-        int colorRes = transaction.getType().equals("EXPENSE") ? R.color.error : R.color.secondary;
+        int colorRes = isExpense ? R.color.error : R.color.secondary;
         holder.binding.tvTransactionAmount.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), colorRes));
 
-        int iconColorRes = transaction.getType().equals("EXPENSE") ? R.color.error : R.color.secondary;
+        int iconColorRes = isExpense ? R.color.error : R.color.secondary;
         holder.binding.ivCategoryIcon.setColorFilter(ContextCompat.getColor(holder.itemView.getContext(), iconColorRes));
 
-        int bgColorRes = transaction.getType().equals("EXPENSE") ? R.color.error_container : R.color.secondary_container;
+        int bgColorRes = isExpense ? R.color.error_container : R.color.secondary_container;
         holder.binding.iconContainer.setCardBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), bgColorRes));
 
         holder.itemView.setOnLongClickListener(v -> {

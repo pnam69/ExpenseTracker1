@@ -20,6 +20,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class HistoryFragment extends Fragment {
@@ -41,26 +42,35 @@ public class HistoryFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         
         setupRecyclerView();
-        
-        viewModel = new ViewModelProvider(this).get(TransactionViewModel.class);
+
+        viewModel = new ViewModelProvider(this)
+                .get(TransactionViewModel.class);
         viewModel.getAllTransactions().observe(getViewLifecycleOwner(), transactions -> {
             if (transactions != null) {
                 this.allTransactions = transactions;
-                filterTransactions(binding.etSearch.getText().toString());
+                applyFilters();
             }
         });
 
         setupSearch();
+        setupFilters();
+    }
+
+    private void setupFilters() {
+        binding.chipGroupFilters.setOnCheckedStateChangeListener((group, checkedIds) -> applyFilters());
     }
 
     private void setupSearch() {
+        binding.ivClearSearch.setOnClickListener(v -> binding.etSearch.setText(""));
+
         binding.etSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filterTransactions(s.toString());
+                binding.ivClearSearch.setVisibility(s.length() > 0 ? View.VISIBLE : View.GONE);
+                applyFilters();
             }
 
             @Override
@@ -68,16 +78,41 @@ public class HistoryFragment extends Fragment {
         });
     }
 
-    private void filterTransactions(String query) {
-        if (query.isEmpty()) {
-            adapter.updateData(allTransactions);
-        } else {
-            List<Transaction> filtered = allTransactions.stream()
-                    .filter(t -> t.getTitle().toLowerCase().contains(query.toLowerCase()) || 
-                            t.getCategory().toLowerCase().contains(query.toLowerCase()))
-                    .collect(Collectors.toList());
-            adapter.updateData(filtered);
+    private void applyFilters() {
+        String query = binding.etSearch.getText().toString().toLowerCase();
+        int checkedId = binding.chipGroupFilters.getCheckedChipId();
+
+        List<Transaction> filtered = new ArrayList<>();
+
+        for (Transaction t : allTransactions) {
+
+            boolean matchesSearch =
+                    query.isEmpty() ||
+                            (t.getTitle() != null &&
+                                    t.getTitle().toLowerCase().contains(query)) ||
+                            (t.getCategory() != null &&
+                                    t.getCategory().toLowerCase().contains(query));
+
+            boolean matchesType = true;
+
+            if (checkedId == R.id.chip_expense) {
+                matchesType = "EXPENSE".equals(t.getType());
+            } else if (checkedId == R.id.chip_income) {
+                matchesType = "INCOME".equals(t.getType());
+            }
+
+            if (matchesSearch && matchesType) {
+                filtered.add(t);
+            }
         }
+
+        adapter.updateData(filtered);
+        binding.layoutEmptyState.setVisibility(
+                filtered.isEmpty() ? View.VISIBLE : View.GONE
+        );
+
+        adapter.updateData(filtered);
+        binding.layoutEmptyState.setVisibility(filtered.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     private void setupRecyclerView() {

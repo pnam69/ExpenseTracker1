@@ -246,11 +246,6 @@
                 android:nestedScrollingEnabled="false"
                 tools:listitem="@layout/item_transaction" />
 
-            <!-- Spacing for Bottom Nav -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="100dp" />
-
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

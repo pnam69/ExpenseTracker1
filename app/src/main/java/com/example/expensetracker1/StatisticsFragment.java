@@ -39,8 +39,9 @@ public class StatisticsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        
-        viewModel = new ViewModelProvider(this).get(TransactionViewModel.class);
+
+        viewModel = new ViewModelProvider(this)
+                .get(TransactionViewModel.class);
         
         viewModel.getAllTransactions().observe(getViewLifecycleOwner(), this::updateUI);
     }
@@ -85,7 +86,7 @@ public class StatisticsFragment extends Fragment {
         binding.pieChart.setData(data);
         binding.pieChart.getDescription().setEnabled(false);
         binding.pieChart.setCenterText("Chi tiêu");
-        binding.pieChart.animateY(1000);
+        //binding.pieChart.animateY(1000);
         binding.pieChart.invalidate();
     }
 

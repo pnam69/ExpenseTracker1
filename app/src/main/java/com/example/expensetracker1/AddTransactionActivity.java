@@ -22,8 +22,8 @@ public class AddTransactionActivity extends AppCompatActivity {
         binding = ActivityAddTransactionBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        viewModel = new ViewModelProvider(this).get(TransactionViewModel.class);
-
+        viewModel = new ViewModelProvider(this)
+                .get(TransactionViewModel.class);
         setupToolbar();
         setupCategoryDropdown();
 

@@ -5,7 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background">
+    android:background="@color/background"
+    android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar"
@@ -162,7 +163,7 @@
             android:clipToPadding="false"
             android:paddingHorizontal="20dp"
             android:paddingTop="8dp"
-            android:paddingBottom="100dp"
+            android:paddingBottom="16dp"
             tools:listitem="@layout/item_transaction" />
 
         <!-- Empty State -->
