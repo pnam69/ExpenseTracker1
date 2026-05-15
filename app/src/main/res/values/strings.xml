@@ -1,0 +1,42 @@
+<resources>
+    <string name="app_name">FinGuard</string>
+    <string name="daily_limit_title">Hạn mức chi tiêu hôm nay</string>
+    <string name="monthly_budget_title">Quản lý ngân sách tháng</string>
+    <string name="quick_add_title">Ghi chép nhanh</string>
+    <string name="recent_transactions_title">Lịch sử giao dịch gần đây</string>
+    <string name="see_all">Xem tất cả</string>
+    <string name="savings_goal_title">Quỹ dự phòng &amp; Mục tiêu</string>
+    <string name="budget_warning_safe">Kế hoạch tài chính đang ổn định</string>
+    <string name="budget_warning_danger">Cảnh báo: Đã chạm 85%% hạn mức chi tiêu!</string>
+
+    <!-- Statistics -->
+    <string name="stats_title">Phân tích chi tiêu</string>
+    <string name="income_total">Tổng thu nhập</string>
+    <string name="expense_total">Tổng chi tiêu</string>
+    <string name="category_distribution">Phân bổ theo hạng mục</string>
+
+    <!-- Goals -->
+    <string name="goal_emergency_fund">Quỹ dự phòng khẩn cấp</string>
+    <string name="goal_investment">Quỹ đầu tư dài hạn</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Cài đặt</string>
+    <string name="settings_profile">Hồ sơ cá nhân</string>
+    <string name="settings_currency">Đơn vị tiền tệ</string>
+    <string name="settings_daily_limit">Hạn mức chi tiêu ngày</string>
+    <string name="settings_notifications">Thông báo nhắc nhở</string>
+    <string name="settings_dark_mode">Chế độ tối</string>
+    <string name="settings_data_reset">Xoá toàn bộ dữ liệu</string>
+    <string name="settings_about">Về ứng dụng</string>
+
+    <!-- History & Search -->
+    <string name="history_title">Lịch sử giao dịch</string>
+    <string name="search_hint">Tìm kiếm giao dịch&#8230;</string>
+    <string name="filter_all">Tất cả</string>
+    <string name="acc_button_settings">Settings</string>
+    <string name="filter_expense">Chi tiêu</string>
+    <string name="filter_income">Thu nhập</string>
+    <string name="filter_this_month">Tháng này</string>
+    <string name="empty_history_title">Không tìm thấy giao dịch</string>
+    <string name="empty_history_desc">Hãy thử thay đổi từ khoá tìm kiếm hoặc bộ lọc</string>
+</resources>

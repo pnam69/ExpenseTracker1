@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Spacing - Horizontal/Vertical Padding & Margins -->
+    <dimen name="spacing_xs">4dp</dimen>
+    <dimen name="spacing_sm">8dp</dimen>
+    <dimen name="spacing_md">12dp</dimen>
+    <dimen name="spacing_lg">16dp</dimen>
+    <dimen name="spacing_xl">20dp</dimen>
+    <dimen name="spacing_2xl">24dp</dimen>
+    <dimen name="spacing_3xl">32dp</dimen>
+    <dimen name="spacing_4xl">48dp</dimen>
+
+    <!-- Common Padding Values -->
+    <dimen name="padding_screen">20dp</dimen>
+    <dimen name="padding_card">16dp</dimen>
+    <dimen name="padding_section">24dp</dimen>
+
+    <!-- Card Dimensions -->
+    <dimen name="card_corner_radius">16dp</dimen>
+    <dimen name="card_elevation">2dp</dimen>
+    <dimen name="card_stroke_width">1dp</dimen>
+
+    <!-- Button Dimensions -->
+    <dimen name="button_height">48dp</dimen>
+    <dimen name="button_height_small">40dp</dimen>
+    <dimen name="button_corner_radius">12dp</dimen>
+    <dimen name="fab_size">56dp</dimen>
+    <dimen name="fab_margin">20dp</dimen>
+
+    <!-- Icon Dimensions -->
+    <dimen name="icon_size_xs">16dp</dimen>
+    <dimen name="icon_size_sm">20dp</dimen>
+    <dimen name="icon_size_md">24dp</dimen>
+    <dimen name="icon_size_lg">32dp</dimen>
+    <dimen name="icon_size_xl">48dp</dimen>
+
+    <!-- Avatar & Profile Images -->
+    <dimen name="avatar_size_sm">32dp</dimen>
+    <dimen name="avatar_size_md">48dp</dimen>
+    <dimen name="avatar_size_lg">80dp</dimen>
+    <dimen name="avatar_corner_radius">50dp</dimen>
+
+    <!-- Text Sizes -->
+    <dimen name="text_size_xs">10sp</dimen>
+    <dimen name="text_size_sm">12sp</dimen>
+    <dimen name="text_size_md">14sp</dimen>
+    <dimen name="text_size_base">16sp</dimen>
+    <dimen name="text_size_lg">18sp</dimen>
+    <dimen name="text_size_xl">20sp</dimen>
+    <dimen name="text_size_2xl">24sp</dimen>
+    <dimen name="text_size_3xl">28sp</dimen>
+    <dimen name="text_size_4xl">32sp</dimen>
+
+    <!-- Line Height -->
+    <dimen name="line_height_sm">1.25</dimen>
+    <dimen name="line_height_md">1.5</dimen>
+    <dimen name="line_height_lg">1.75</dimen>
+
+    <!-- Divider & Separator -->
+    <dimen name="divider_height">1dp</dimen>
+    <dimen name="divider_width_full">1dp</dimen>
+
+    <!-- Progress Indicator -->
+    <dimen name="progress_height">8dp</dimen>
+    <dimen name="progress_corner_radius">4dp</dimen>
+
+    <!-- Chip Dimensions -->
+    <dimen name="chip_height">32dp</dimen>
+    <dimen name="chip_corner_radius">12dp</dimen>
+
+    <!-- Bottom Navigation -->
+    <dimen name="bottom_nav_height">64dp</dimen>
+
+    <!-- Toolbar -->
+    <dimen name="toolbar_height">56dp</dimen>
+
+    <!-- RecyclerView Item Spacing -->
+    <dimen name="item_spacing_vertical">8dp</dimen>
+    <dimen name="item_spacing_horizontal">4dp</dimen>
+
+    <!-- Container Max Width (for large screens) -->
+    <dimen name="container_max_width">600dp</dimen>
+
+    <!-- Elevation Levels -->
+    <dimen name="elevation_level_0">0dp</dimen>
+    <dimen name="elevation_level_1">2dp</dimen>
+    <dimen name="elevation_level_2">4dp</dimen>
+    <dimen name="elevation_level_3">8dp</dimen>
+    <dimen name="elevation_level_4">12dp</dimen>
+
+    <!-- Search Bar -->
+    <dimen name="search_bar_height">48dp</dimen>
+    <dimen name="search_bar_corner_radius">12dp</dimen>
+
+    <!-- Input Fields -->
+    <dimen name="input_field_height">48dp</dimen>
+    <dimen name="input_field_corner_radius">8dp</dimen>
+
+</resources>
+

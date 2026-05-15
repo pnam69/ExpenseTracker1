@@ -1,0 +1,58 @@
+package com.example.expensetracker1;
+
+import android.content.Intent;
+import android.os.Bundle;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+
+import com.example.expensetracker1.databinding.ActivityMainBinding;
+
+public class MainActivity extends AppCompatActivity {
+
+    private ActivityMainBinding binding;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
+        setupNavigation();
+
+        if (savedInstanceState == null) {
+            loadFragment(new DashboardFragment());
+        }
+    }
+
+    private void setupNavigation() {
+        binding.bottomNavigation.setOnItemSelectedListener(item -> {
+            Fragment fragment;
+            int id = item.getItemId();
+            if (id == R.id.navigation_dashboard) {
+                fragment = new DashboardFragment();
+            } else if (id == R.id.navigation_history) {
+                fragment = new HistoryFragment();
+            } else if (id == R.id.navigation_statistics) {
+                fragment = new StatisticsFragment();
+            } else if (id == R.id.navigation_settings) {
+                fragment = new SettingsFragment();
+            } else {
+                fragment = new DashboardFragment();
+            }
+            loadFragment(fragment);
+            return true;
+        });
+
+        binding.fabAddTransaction.setOnClickListener(v -> {
+            Intent intent = new Intent(this, AddTransactionActivity.class);
+            startActivity(intent);
+        });
+    }
+
+    private void loadFragment(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.nav_host_fragment, fragment)
+                .commit();
+    }
+}
