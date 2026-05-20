@@ -29,6 +29,16 @@
     <string name="settings_data_reset">Xoá toàn bộ dữ liệu</string>
     <string name="settings_about">Về ứng dụng</string>
 
+    <!-- Dashboard -->
+    <string name="dashboard_greeting">Chào buổi sáng!</string>
+    <string name="chip_meal">🍱 Ăn uống</string>
+    <string name="chip_market">🛒 Đi chợ</string>
+    <string name="chip_fuel">⛽ Đổ xăng</string>
+    <string name="chip_bill">📑 Hoá đơn</string>
+    <string name="goal_progress">8.5tr / 15tr</string>
+    <string name="budget_progress">42%%</string>
+    <string name="savings_message">Bạn đang duy trì thói quen tiết kiệm rất tốt</string>
+
     <!-- History & Search -->
     <string name="history_title">Lịch sử giao dịch</string>
     <string name="search_hint">Tìm kiếm giao dịch&#8230;</string>
