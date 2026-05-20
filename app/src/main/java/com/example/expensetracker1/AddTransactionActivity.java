@@ -39,7 +39,10 @@ public class AddTransactionActivity extends AppCompatActivity {
     }
 
     private void setupCategoryDropdown() {
-        String[] categories = {"Ăn uống", "Đi lại", "Sinh hoạt", "Học tập", "Lương", "Khác"};
+        String[] categories = {
+                "Ăn uống", "Đi lại", "Mua sắm", "Nhà cửa", "Hoá đơn",
+                "Giải trí", "Sức khỏe", "Giáo dục", "Lương", "Thưởng", "Khác"
+        };
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, categories);
         binding.actvCategory.setAdapter(adapter);
     }

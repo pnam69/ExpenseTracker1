@@ -19,6 +19,7 @@ import com.example.expensetracker1.viewmodel.TransactionViewModel;
 import android.text.Editable;
 import android.text.TextWatcher;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -84,32 +85,29 @@ public class HistoryFragment extends Fragment {
 
         List<Transaction> filtered = new ArrayList<>();
 
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        long startOfMonth = calendar.getTimeInMillis();
+
         for (Transaction t : allTransactions) {
-
-            boolean matchesSearch =
-                    query.isEmpty() ||
-                            (t.getTitle() != null &&
-                                    t.getTitle().toLowerCase().contains(query)) ||
-                            (t.getCategory() != null &&
-                                    t.getCategory().toLowerCase().contains(query));
-
-            boolean matchesType = true;
-
+            boolean matchesSearch = query.isEmpty() || 
+                    (t.getTitle() != null && t.getTitle().toLowerCase().contains(query)) ||
+                    (t.getCategory() != null && t.getCategory().toLowerCase().contains(query));
+            
+            boolean matchesChip = true;
             if (checkedId == R.id.chip_expense) {
-                matchesType = "EXPENSE".equals(t.getType());
+                matchesChip = "EXPENSE".equals(t.getType());
             } else if (checkedId == R.id.chip_income) {
-                matchesType = "INCOME".equals(t.getType());
+                matchesChip = "INCOME".equals(t.getType());
+            } else if (checkedId == R.id.chip_this_month) {
+                matchesChip = t.getDate() >= startOfMonth;
             }
-
-            if (matchesSearch && matchesType) {
+            
+            if (matchesSearch && matchesChip) {
                 filtered.add(t);
             }
         }
-
-        adapter.updateData(filtered);
-        binding.layoutEmptyState.setVisibility(
-                filtered.isEmpty() ? View.VISIBLE : View.GONE
-        );
 
         adapter.updateData(filtered);
         binding.layoutEmptyState.setVisibility(filtered.isEmpty() ? View.VISIBLE : View.GONE);

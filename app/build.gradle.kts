@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace = "com.example.expensetracker1"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.expensetracker1"

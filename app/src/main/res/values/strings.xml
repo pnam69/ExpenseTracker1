@@ -50,4 +50,10 @@
     <string name="empty_history_title">Không tìm thấy giao dịch</string>
     <string name="empty_history_desc">Hãy thử thay đổi từ khoá tìm kiếm hoặc bộ lọc</string>
     <string name="add_transaction">Thêm giao dịch</string>
+
+    <!-- Stats Filters -->
+    <string name="stats_filter_all">Tất cả</string>
+    <string name="stats_filter_month">Tháng này</string>
+    <string name="stats_filter_week">Tuần này</string>
+    <string name="stats_filter_today">Hôm nay</string>
 </resources>

@@ -20,6 +20,7 @@ import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ public class StatisticsFragment extends Fragment {
 
     private FragmentStatisticsBinding binding;
     private TransactionViewModel viewModel;
+    private List<Transaction> allTransactions = new ArrayList<>();
 
     @Nullable
     @Override
@@ -43,7 +45,59 @@ public class StatisticsFragment extends Fragment {
         viewModel = new ViewModelProvider(this)
                 .get(TransactionViewModel.class);
         
-        viewModel.getAllTransactions().observe(getViewLifecycleOwner(), this::updateUI);
+        viewModel.getAllTransactions().observe(getViewLifecycleOwner(), transactions -> {
+            if (transactions != null) {
+                this.allTransactions = transactions;
+                applyFilters();
+            }
+        });
+
+        binding.chipGroupTime.setOnCheckedStateChangeListener((group, checkedIds) -> applyFilters());
+        binding.chipGroupType.setOnCheckedStateChangeListener((group, checkedIds) -> applyFilters());
+    }
+
+    private void applyFilters() {
+        if (allTransactions == null) return;
+
+        int timeId = binding.chipGroupTime.getCheckedChipId();
+        List<Transaction> filtered = new ArrayList<>();
+        
+        Calendar calendar = Calendar.getInstance();
+        
+        if (timeId == R.id.chip_today) {
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+            long startOfToday = calendar.getTimeInMillis();
+            for (Transaction t : allTransactions) {
+                if (t.getDate() >= startOfToday) filtered.add(t);
+            }
+        } else if (timeId == R.id.chip_this_month) {
+            calendar.set(Calendar.DAY_OF_MONTH, 1);
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+            long startOfMonth = calendar.getTimeInMillis();
+            for (Transaction t : allTransactions) {
+                if (t.getDate() >= startOfMonth) filtered.add(t);
+            }
+        } else if (timeId == R.id.chip_this_week) {
+            calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+            long startOfWeek = calendar.getTimeInMillis();
+            for (Transaction t : allTransactions) {
+                if (t.getDate() >= startOfWeek) filtered.add(t);
+            }
+        } else {
+            filtered = allTransactions;
+        }
+
+        updateUI(filtered);
     }
 
     private void updateUI(List<Transaction> transactions) {
@@ -52,12 +106,18 @@ public class StatisticsFragment extends Fragment {
         double income = 0;
         double expense = 0;
         Map<String, Double> categoryMap = new HashMap<>();
+        
+        int typeId = binding.chipGroupType.getCheckedChipId();
+        String targetType = (typeId == R.id.chip_income_chart) ? "INCOME" : "EXPENSE";
 
         for (Transaction t : transactions) {
             if ("INCOME".equals(t.getType())) {
                 income += t.getAmount();
             } else {
                 expense += t.getAmount();
+            }
+            
+            if (targetType.equals(t.getType())) {
                 Double currentAmount = categoryMap.getOrDefault(t.getCategory(), 0.0);
                 if (currentAmount != null) {
                     categoryMap.put(t.getCategory(), currentAmount + t.getAmount());
@@ -68,10 +128,10 @@ public class StatisticsFragment extends Fragment {
         binding.tvTotalIncome.setText(AppSettings.formatAmount(requireContext(), income));
         binding.tvTotalExpenses.setText(AppSettings.formatAmount(requireContext(), expense));
 
-        setupPieChart(categoryMap);
+        setupPieChart(categoryMap, targetType);
     }
 
-    private void setupPieChart(Map<String, Double> categoryMap) {
+    private void setupPieChart(Map<String, Double> categoryMap, String type) {
         List<PieEntry> entries = new ArrayList<>();
         for (Map.Entry<String, Double> entry : categoryMap.entrySet()) {
             entries.add(new PieEntry(entry.getValue().floatValue(), entry.getKey()));
@@ -85,8 +145,7 @@ public class StatisticsFragment extends Fragment {
         PieData data = new PieData(dataSet);
         binding.pieChart.setData(data);
         binding.pieChart.getDescription().setEnabled(false);
-        binding.pieChart.setCenterText("Chi tiêu");
-        //binding.pieChart.animateY(1000);
+        binding.pieChart.setCenterText("INCOME".equals(type) ? "Thu nhập" : "Chi tiêu");
         binding.pieChart.invalidate();
     }
 

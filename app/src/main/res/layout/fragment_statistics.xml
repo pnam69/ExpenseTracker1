@@ -18,6 +18,44 @@
             android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
             android:textStyle="bold" />
 
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chip_group_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:singleSelection="true"
+            app:selectionRequired="true"
+            app:checkedChip="@+id/chip_all_time">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_all_time"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/stats_filter_all" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_this_month"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/stats_filter_month" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_this_week"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/stats_filter_week" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_today"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/stats_filter_today" />
+        </com.google.android.material.chip.ChipGroup>
+
         <!-- Income vs Expense Summary Card -->
         <com.google.android.material.card.MaterialCardView
             style="@style/Widget.App.Card"
@@ -93,6 +131,30 @@
             android:text="@string/category_distribution"
             android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
             android:textStyle="bold" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chip_group_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:singleSelection="true"
+            app:selectionRequired="true"
+            app:checkedChip="@+id/chip_expense_chart">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_expense_chart"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/filter_expense" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_income_chart"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/filter_income" />
+        </com.google.android.material.chip.ChipGroup>
 
         <com.google.android.material.card.MaterialCardView
             style="@style/Widget.App.Card"
