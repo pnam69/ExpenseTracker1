@@ -21,10 +21,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Chào buổi sáng! 👋"
+                android:text="Chào buổi sáng!"
                 android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-                android:textStyle="bold"
-                android:textColor="@color/text_primary" />
+                android:textColor="@color/text_primary"
+                android:textStyle="bold" />
 
             <!-- HERO CARD: Daily Remaining -->
             <com.google.android.material.card.MaterialCardView

@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.expensetracker1.data.Transaction;
 import com.example.expensetracker1.databinding.FragmentStatisticsBinding;
+import com.example.expensetracker1.util.AppSettings;
 import com.example.expensetracker1.viewmodel.TransactionViewModel;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -21,7 +22,6 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 public class StatisticsFragment extends Fragment {
@@ -65,8 +65,8 @@ public class StatisticsFragment extends Fragment {
             }
         }
 
-        binding.tvTotalIncome.setText(String.format(Locale.getDefault(), "%,.0fđ", income));
-        binding.tvTotalExpenses.setText(String.format(Locale.getDefault(), "%,.0fđ", expense));
+        binding.tvTotalIncome.setText(AppSettings.formatAmount(requireContext(), income));
+        binding.tvTotalExpenses.setText(AppSettings.formatAmount(requireContext(), expense));
 
         setupPieChart(categoryMap);
     }

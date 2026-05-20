@@ -39,4 +39,5 @@
     <string name="filter_this_month">Tháng này</string>
     <string name="empty_history_title">Không tìm thấy giao dịch</string>
     <string name="empty_history_desc">Hãy thử thay đổi từ khoá tìm kiếm hoặc bộ lọc</string>
+    <string name="add_transaction">Thêm giao dịch</string>
 </resources>

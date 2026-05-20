@@ -24,9 +24,15 @@ public interface TransactionDao {
     @Delete
     void delete(Transaction transaction);
 
+    @Query("DELETE FROM transactions")
+    void deleteAllTransactions();
+
     @Query("SELECT SUM(amount) FROM transactions WHERE type = 'INCOME'")
     LiveData<Double> getTotalIncome();
 
     @Query("SELECT SUM(amount) FROM transactions WHERE type = 'EXPENSE'")
     LiveData<Double> getTotalExpenses();
+
+    @Query("SELECT SUM(amount) FROM transactions WHERE type = 'EXPENSE' AND date >= :startOfDay AND date < :endOfDay")
+    LiveData<Double> getTodayExpenses(long startOfDay, long endOfDay);
 }

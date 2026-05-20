@@ -1,10 +1,10 @@
 package com.example.expensetracker1;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,11 +15,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.expensetracker1.data.Transaction;
 import com.example.expensetracker1.databinding.FragmentDashboardBinding;
+import com.example.expensetracker1.util.AppSettings;
 import com.example.expensetracker1.viewmodel.TransactionViewModel;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 
 public class DashboardFragment extends Fragment {
 
@@ -47,8 +48,11 @@ public class DashboardFragment extends Fragment {
     }
 
     private void observeData() {
-        viewModel.getTotalExpenses().observe(getViewLifecycleOwner(), totalExpenses -> {
-            double spent = totalExpenses != null ? totalExpenses : 0.0;
+        long startOfDay = getStartOfDayMillis();
+        long endOfDay = startOfDay + 24L * 60L * 60L * 1000L;
+
+        viewModel.getTodayExpenses(startOfDay, endOfDay).observe(getViewLifecycleOwner(), todayExpenses -> {
+            double spent = todayExpenses != null ? todayExpenses : 0.0;
             updateAssistantUI(spent);
         });
 
@@ -61,14 +65,23 @@ public class DashboardFragment extends Fragment {
         });
     }
 
+    private long getStartOfDayMillis() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTimeInMillis();
+    }
+
     private void updateAssistantUI(double spentToday) {
-        double dailyBudget = 200000.0; // 200k/day
+        double dailyBudget = AppSettings.getDailyLimit(requireContext());
         double remainingValue = dailyBudget - spentToday;
         if (remainingValue < 0) remainingValue = 0;
 
-        binding.tvDailyRemaining.setText(String.format(Locale.getDefault(), "%,.0fđ", remainingValue));
+        binding.tvDailyRemaining.setText(AppSettings.formatAmount(requireContext(), remainingValue));
 
-        double monthlyLimit = 5000000.0;
+        double monthlyLimit = dailyBudget * 30.0;
         int percent = (int) ((spentToday / monthlyLimit) * 100);
         if (percent > 100) percent = 100;
 
@@ -92,9 +105,12 @@ public class DashboardFragment extends Fragment {
     }
 
     private void quickAdd(String title, double amount, String category) {
-        Transaction transaction = new Transaction(0, title, amount, category, System.currentTimeMillis(), "", "EXPENSE");
-        viewModel.insert(transaction);
-        Toast.makeText(requireContext(), "Đã thêm " + title, Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(requireContext(), AddTransactionActivity.class);
+        intent.putExtra(AddTransactionActivity.EXTRA_TITLE, title);
+        intent.putExtra(AddTransactionActivity.EXTRA_AMOUNT, amount);
+        intent.putExtra(AddTransactionActivity.EXTRA_CATEGORY, category);
+        intent.putExtra(AddTransactionActivity.EXTRA_TYPE, "EXPENSE");
+        startActivity(intent);
     }
 
     private void setupRecyclerView() {

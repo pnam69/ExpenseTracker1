@@ -1,0 +1,85 @@
+package com.example.expensetracker1.util;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import java.util.Locale;
+
+public final class AppSettings {
+
+    private static final String PREFS_NAME = "expense_tracker_settings";
+    private static final String KEY_DARK_MODE = "dark_mode";
+    private static final String KEY_CURRENCY_LABEL = "currency_label";
+    private static final String KEY_CURRENCY_SYMBOL = "currency_symbol";
+    private static final String KEY_DAILY_LIMIT = "daily_limit";
+
+    public static final String DEFAULT_CURRENCY_LABEL = "Việt Nam Đồng (VND)";
+    public static final String DEFAULT_CURRENCY_SYMBOL = "đ";
+    public static final double DEFAULT_DAILY_LIMIT = 200_000.0;
+
+    private AppSettings() {
+    }
+
+    private static SharedPreferences prefs(Context context) {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+    }
+
+    public static boolean isDarkModeEnabled(Context context) {
+        return prefs(context).getBoolean(KEY_DARK_MODE, false);
+    }
+
+    public static void setDarkModeEnabled(Context context, boolean enabled) {
+        prefs(context).edit().putBoolean(KEY_DARK_MODE, enabled).apply();
+    }
+
+    public static String getCurrencyLabel(Context context) {
+        return prefs(context).getString(KEY_CURRENCY_LABEL, DEFAULT_CURRENCY_LABEL);
+    }
+
+    public static String getCurrencySymbol(Context context) {
+        return prefs(context).getString(KEY_CURRENCY_SYMBOL, DEFAULT_CURRENCY_SYMBOL);
+    }
+
+    public static void setCurrency(Context context, String label, String symbol) {
+        prefs(context).edit()
+                .putString(KEY_CURRENCY_LABEL, label)
+                .putString(KEY_CURRENCY_SYMBOL, symbol)
+                .apply();
+    }
+
+    public static double getDailyLimit(Context context) {
+        return Double.longBitsToDouble(
+                prefs(context).getLong(KEY_DAILY_LIMIT, Double.doubleToRawLongBits(DEFAULT_DAILY_LIMIT))
+        );
+    }
+
+    public static void setDailyLimit(Context context, double dailyLimit) {
+        double sanitizedLimit = Math.max(0.0, dailyLimit);
+        prefs(context).edit().putLong(KEY_DAILY_LIMIT, Double.doubleToRawLongBits(sanitizedLimit)).apply();
+    }
+
+    public static double getExchangeRate(Context context) {
+        String symbol = getCurrencySymbol(context);
+        if ("$".equals(symbol)) {
+            return 1.0 / 25000.0; // 1 USD = 25,000 VND
+        } else if ("€".equals(symbol)) {
+            return 1.0 / 27000.0; // 1 EUR = 27,000 VND
+        }
+        return 1.0;
+    }
+
+    public static String formatAmount(Context context, double amountVnd) {
+        double rate = getExchangeRate(context);
+        double converted = amountVnd * rate;
+        String symbol = getCurrencySymbol(context);
+
+        if ("đ".equals(symbol) || "₫".equals(symbol)) {
+            String formatted = String.format(Locale.getDefault(), "%,.0f", converted);
+            return formatted + symbol;
+        }
+
+        String formatted = String.format(Locale.US, "%,.2f", converted);
+        return symbol + formatted;
+    }
+}
+

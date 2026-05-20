@@ -1,6 +1,8 @@
 package com.example.expensetracker1.viewmodel;
 
 import android.app.Application;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -40,11 +42,28 @@ public class TransactionViewModel extends AndroidViewModel {
         return transactionDao.getTotalExpenses();
     }
 
+    public LiveData<Double> getTodayExpenses(long startOfDay, long endOfDay) {
+        return transactionDao.getTodayExpenses(startOfDay, endOfDay);
+    }
+
     public void insert(Transaction transaction) {
         executorService.execute(() -> transactionDao.insert(transaction));
     }
 
     public void delete(Transaction transaction) {
         executorService.execute(() -> transactionDao.delete(transaction));
+    }
+
+    public void deleteAllTransactions() {
+        executorService.execute(transactionDao::deleteAllTransactions);
+    }
+
+    public void deleteAllTransactions(Runnable onComplete) {
+        executorService.execute(() -> {
+            transactionDao.deleteAllTransactions();
+            if (onComplete != null) {
+                new Handler(Looper.getMainLooper()).post(onComplete);
+            }
+        });
     }
 }

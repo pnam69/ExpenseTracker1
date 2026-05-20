@@ -9,9 +9,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.expensetracker1.data.Transaction;
 import com.example.expensetracker1.databinding.ItemTransactionBinding;
+import com.example.expensetracker1.util.AppSettings;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder> {
@@ -50,7 +50,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
         boolean isExpense = Objects.equals(transaction.getType(), "EXPENSE");
         String prefix = isExpense ? "-" : "+";
-        holder.binding.tvTransactionAmount.setText(prefix + String.format(Locale.getDefault(), "%,.0fđ", transaction.getAmount()));
+        holder.binding.tvTransactionAmount.setText(prefix + AppSettings.formatAmount(holder.itemView.getContext(), transaction.getAmount()));
 
         int colorRes = isExpense ? R.color.error : R.color.secondary;
         holder.binding.tvTransactionAmount.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), colorRes));
