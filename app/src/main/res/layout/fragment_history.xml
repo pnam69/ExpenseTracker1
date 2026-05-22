@@ -87,6 +87,7 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_sort_history"
                     style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
@@ -118,7 +119,7 @@
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chip_all"
-                        style="@style/Widget.Material3.Chip.Filter"
+                        style="@style/Widget.App.Chip.Filter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/filter_all"
@@ -126,21 +127,21 @@
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chip_expense"
-                        style="@style/Widget.Material3.Chip.Filter"
+                        style="@style/Widget.App.Chip.Filter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/filter_expense" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chip_income"
-                        style="@style/Widget.Material3.Chip.Filter"
+                        style="@style/Widget.App.Chip.Filter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/filter_income" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chip_this_month"
-                        style="@style/Widget.Material3.Chip.Filter"
+                        style="@style/Widget.App.Chip.Filter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/filter_this_month" />

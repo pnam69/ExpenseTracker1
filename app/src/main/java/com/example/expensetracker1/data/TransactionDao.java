@@ -15,6 +15,9 @@ public interface TransactionDao {
     @Query("SELECT * FROM transactions ORDER BY date DESC")
     LiveData<List<Transaction>> getAllTransactions();
 
+    @Query("SELECT * FROM transactions WHERE id = :id")
+    LiveData<Transaction> getTransactionById(int id);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(Transaction transaction);
 
@@ -35,4 +38,7 @@ public interface TransactionDao {
 
     @Query("SELECT SUM(amount) FROM transactions WHERE type = 'EXPENSE' AND date >= :startOfDay AND date < :endOfDay")
     LiveData<Double> getTodayExpenses(long startOfDay, long endOfDay);
+
+    @Query("SELECT SUM(amount) FROM transactions WHERE type = 'EXPENSE' AND date >= :startOfMonth")
+    LiveData<Double> getMonthExpenses(long startOfMonth);
 }

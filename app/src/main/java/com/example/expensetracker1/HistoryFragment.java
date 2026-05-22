@@ -8,10 +8,14 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import com.example.expensetracker1.data.Transaction;
 import com.example.expensetracker1.databinding.FragmentHistoryBinding;
 import com.example.expensetracker1.viewmodel.TransactionViewModel;
@@ -30,6 +34,7 @@ public class HistoryFragment extends Fragment {
     private TransactionViewModel viewModel;
     private TransactionAdapter adapter;
     private List<Transaction> allTransactions = new ArrayList<>();
+    private int currentSortOrder = 0; // 0: Newest, 1: Oldest, 2: High -> Low, 3: Low -> High
 
     @Nullable
     @Override
@@ -55,6 +60,25 @@ public class HistoryFragment extends Fragment {
 
         setupSearch();
         setupFilters();
+        
+        binding.btnSortHistory.setOnClickListener(v -> showSortDialog());
+    }
+
+    private void showSortDialog() {
+        String[] options = {"Mới nhất", "Cũ nhất", "Số tiền (Cao - Thấp)", "Số tiền (Thấp - Cao)"};
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Sắp xếp giao dịch")
+                .setItems(options, (dialog, which) -> {
+                    sortTransactions(which);
+                })
+                .show();
+    }
+
+    private void sortTransactions(int which) {
+        currentSortOrder = which;
+        if (getContext() != null) {
+            applyFilters();
+        }
     }
 
     private void setupFilters() {
@@ -109,6 +133,20 @@ public class HistoryFragment extends Fragment {
             }
         }
 
+        // Apply Sorting
+        filtered.sort((t1, t2) -> {
+            switch (currentSortOrder) {
+                case 1: // Oldest
+                    return Long.compare(t1.getDate(), t2.getDate());
+                case 2: // High -> Low
+                    return Double.compare(t2.getAmount(), t1.getAmount());
+                case 3: // Low -> High
+                    return Double.compare(t1.getAmount(), t2.getAmount());
+                default: // Newest
+                    return Long.compare(t2.getDate(), t1.getDate());
+            }
+        });
+
         adapter.updateData(filtered);
         binding.layoutEmptyState.setVisibility(filtered.isEmpty() ? View.VISIBLE : View.GONE);
     }
@@ -116,18 +154,43 @@ public class HistoryFragment extends Fragment {
     private void setupRecyclerView() {
         adapter = new TransactionAdapter(new ArrayList<>());
         adapter.setOnItemLongClickListener(this::showDeleteDialog);
+        adapter.setOnItemClickListener(this::editTransaction);
         binding.rvHistory.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvHistory.setAdapter(adapter);
+
+        // Swipe to Delete
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                Transaction transaction = adapter.getTransactionAt(position);
+                showDeleteDialog(transaction);
+                // Need to notify adapter to restore the item if user cancels, or just refresh
+                adapter.notifyItemChanged(position);
+            }
+        }).attachToRecyclerView(binding.rvHistory);
+    }
+
+    private void editTransaction(Transaction transaction) {
+        Intent intent = new Intent(requireContext(), AddTransactionActivity.class);
+        intent.putExtra(AddTransactionActivity.EXTRA_ID, transaction.getId());
+        startActivity(intent);
     }
 
     private void showDeleteDialog(Transaction transaction) {
-        new AlertDialog.Builder(requireContext())
-                .setTitle("Xoá giao dịch")
-                .setMessage("Bạn có chắc chắn muốn xoá '" + transaction.getTitle() + "'?")
-                .setPositiveButton("Xoá", (dialog, which) -> {
+        if (transaction == null || getContext() == null) return;
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.dialog_delete_title)
+                .setMessage(getString(R.string.dialog_delete_msg))
+                .setPositiveButton(R.string.delete, (dialog, which) -> {
                     viewModel.delete(transaction);
                 })
-                .setNegativeButton("Huỷ", null)
+                .setNegativeButton(R.string.cancel, null)
                 .show();
     }
 

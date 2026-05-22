@@ -50,6 +50,14 @@ public class MainActivity extends AppCompatActivity {
                 fragment = new DashboardFragment();
             }
             loadFragment(fragment);
+            
+            // Hiện/Ẩn FAB tùy theo Fragment
+            if (id == R.id.navigation_settings || id == R.id.navigation_statistics) {
+                binding.fabAddTransaction.hide();
+            } else {
+                binding.fabAddTransaction.show();
+            }
+
             return true;
         });
 
@@ -63,5 +71,9 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.nav_host_fragment, fragment)
                 .commit();
+    }
+
+    public void navigateToHistory() {
+        binding.bottomNavigation.setSelectedItemId(R.id.navigation_history);
     }
 }
