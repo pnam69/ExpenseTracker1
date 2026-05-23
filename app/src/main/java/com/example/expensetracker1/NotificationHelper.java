@@ -5,18 +5,28 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Build;
 import androidx.core.app.NotificationCompat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class NotificationHelper {
+
+    private static String getCurrentTime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy", Locale.getDefault());
+        return sdf.format(new Date());
+    }
+
     public static void checkAndSendBudgetNotification(Context context, double hanMucConLai) {
         String title;
         String message;
+        String timeStr = getCurrentTime();
 
         if (hanMucConLai == 0) {
             title = "Cảnh báo hết tiền! \uD83D\uDEA8";
-            message = "Bạn đã tiêu sạch hạn mức của ngày hôm nay. Hãy dừng mua sắm nhé!";
+            message = "Bạn đã tiêu sạch hạn mức của ngày hôm nay. Hãy dừng mua sắm nhé!\n " + timeStr;
         } else if (hanMucConLai < 0) {
             title = "Báo động đỏ: Vượt hạn mức! \uD83D\uDED1";
-            message = "Bạn đã tiêu lố " + Math.abs(hanMucConLai) + "đ so với dự kiến rồi!";
+            message = "Bạn đã tiêu lố " + Math.abs(hanMucConLai) + "đ so với dự kiến rồi!\n " + timeStr;
         } else {
             return;
         }
@@ -42,7 +52,9 @@ public class NotificationHelper {
                 .setContentTitle(title)
                 .setContentText(message)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setAutoCancel(true);
+                .setAutoCancel(true)
+                .setShowWhen(true)
+                .setWhen(System.currentTimeMillis());
 
         if (notificationManager != null) {
             notificationManager.notify(2, builder.build());
@@ -52,7 +64,8 @@ public class NotificationHelper {
     public static void sendIncomeNotification(Context context, double soTienThu, String tenKhoanThu) {
         String title = "Tiền về! \uD83C\uDF89";
         String soTienChu = (soTienThu == (long) soTienThu) ? String.valueOf((long) soTienThu) : String.valueOf(soTienThu);
-        String message = "Bạn vừa ghi nhận khoản thu " + soTienChu + "đ từ việc " + tenKhoanThu + ".";
+        String timeStr = getCurrentTime();
+        String message = "Bạn vừa ghi nhận khoản thu " + soTienChu + "đ từ việc " + tenKhoanThu + ".\n " + timeStr;
 
         String CHANNEL_ID = "expense_tracker_channel";
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -74,7 +87,9 @@ public class NotificationHelper {
                 .setContentTitle(title)
                 .setContentText(message)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setAutoCancel(true);
+                .setAutoCancel(true)
+                .setShowWhen(true)
+                .setWhen(System.currentTimeMillis());
 
         if (notificationManager != null) {
             notificationManager.notify(3, builder.build());

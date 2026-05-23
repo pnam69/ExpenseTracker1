@@ -38,17 +38,31 @@ public class MainActivity extends AppCompatActivity {
         binding.bottomNavigation.setOnItemSelectedListener(item -> {
             Fragment fragment;
             int id = item.getItemId();
+            boolean showFab = true;
+            
             if (id == R.id.navigation_dashboard) {
                 fragment = new DashboardFragment();
+                showFab = true;
             } else if (id == R.id.navigation_history) {
                 fragment = new HistoryFragment();
+                showFab = true;
             } else if (id == R.id.navigation_statistics) {
                 fragment = new StatisticsFragment();
+                showFab = false;
             } else if (id == R.id.navigation_settings) {
                 fragment = new SettingsFragment();
+                showFab = false;
             } else {
                 fragment = new DashboardFragment();
+                showFab = true;
             }
+            
+            if (showFab) {
+                binding.fabAddTransaction.show();
+            } else {
+                binding.fabAddTransaction.hide();
+            }
+
             loadFragment(fragment);
             return true;
         });
