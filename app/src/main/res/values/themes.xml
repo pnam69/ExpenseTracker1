@@ -17,6 +17,9 @@
         <item name="android:windowBackground">@color/background</item>
         <item name="android:statusBarColor">@color/background</item>
         <item name="android:windowLightStatusBar">true</item>
+
+        <!-- Material3 TextInputLayout default style -->
+        <item name="textInputStyle">@style/Widget.Material3.TextInputLayout.OutlinedBox</item>
     </style>
 
     <style name="Widget.App.Card" parent="Widget.Material3.CardView.Elevated">
