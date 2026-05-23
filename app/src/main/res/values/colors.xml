@@ -2,38 +2,29 @@
 <resources>
     <!-- Primary Brand Colors - Blue -->
     <color name="primary">#2563EB</color>
-    <color name="primary_light">#3B82F6</color>
-    <color name="primary_dark">#1D4ED8</color>
-    <color name="primary_container">#DBEAFE</color>
     <color name="on_primary">#FFFFFF</color>
+    <color name="primary_container">#DBEAFE</color>
+    <color name="on_primary_container">#1E3A8A</color>
+    <color name="on_primary_variant">#CCFFFFFF</color>
+    <color name="on_primary_disabled">#80FFFFFF</color>
 
-    <!-- Secondary/Accent Colors - Green (Income) -->
+    <!-- Secondary/Accent Colors - Green -->
     <color name="secondary">#10B981</color>
-    <color name="secondary_light">#34D399</color>
-    <color name="secondary_dark">#059669</color>
-    <color name="secondary_container">#D1FAE5</color>
     <color name="on_secondary">#FFFFFF</color>
+    <color name="secondary_container">#D1FAE5</color>
+    <color name="on_secondary_container">#003822</color>
 
-    <!-- Tertiary/Warning Colors - Red (Expenses) -->
+    <!-- Tertiary/Warning Colors - Red -->
     <color name="error">#EF4444</color>
-    <color name="error_light">#F87171</color>
-    <color name="error_dark">#DC2626</color>
-    <color name="error_container">#FEE2E2</color>
     <color name="on_error">#FFFFFF</color>
-
-    <!-- Additional Accent Colors -->
-    <color name="warning">#F59E0B</color> <!-- Amber for Warnings -->
-    <color name="warning_light">#FBBF24</color>
-    <color name="warning_container">#FEF3C7</color>
-
-    <color name="info">#0EA5E9</color> <!-- Sky Blue for Info -->
-    <color name="info_container">#CFFAFE</color>
+    <color name="error_container">#FEE2E2</color>
+    <color name="on_error_container">#690005</color>
 
     <!-- Background and Neutral -->
     <color name="background">#F8FAFC</color>
-    <color name="background_alt">#F1F5F9</color>
     <color name="surface">#FFFFFF</color>
     <color name="surface_variant">#F3F4F6</color>
+    <color name="on_surface">#1A1C1E</color>
     <color name="outline">#E2E8F0</color>
     <color name="outline_variant">#CBD5E1</color>
 
@@ -41,27 +32,9 @@
     <color name="text_primary">#1E293B</color>
     <color name="text_secondary">#64748B</color>
     <color name="text_tertiary">#94A3B8</color>
-    <color name="text_disabled">#CBD5E1</color>
-
-    <!-- Semantic Colors -->
-    <color name="success">#10B981</color>
-    <color name="success_container">#ECFDF5</color>
 
     <!-- Monochrome -->
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
-    <color name="gray_50">#F9FAFB</color>
-    <color name="gray_100">#F3F4F6</color>
-    <color name="gray_200">#E5E7EB</color>
-    <color name="gray_300">#D1D5DB</color>
-    <color name="gray_400">#9CA3AF</color>
-    <color name="gray_500">#6B7280</color>
-    <color name="gray_600">#4B5563</color>
-    <color name="gray_700">#374151</color>
-    <color name="gray_800">#1F2937</color>
-    <color name="gray_900">#111827</color>
-
-    <!-- Transparent Variants -->
     <color name="transparent">#00000000</color>
-    <color name="scrim">#52000000</color>
 </resources>

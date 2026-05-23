@@ -29,7 +29,8 @@ public class AddTransactionActivity extends AppCompatActivity {
         binding = ActivityAddTransactionBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        viewModel = new ViewModelProvider(this).get(TransactionViewModel.class);
+        viewModel = new ViewModelProvider(this)
+                .get(TransactionViewModel.class);
         setupToolbar();
         setupCategoryDropdown();
         applyPresetFromIntent();
@@ -86,8 +87,8 @@ public class AddTransactionActivity extends AppCompatActivity {
     }
 
     private void saveTransaction() {
-        String amountStr = String.valueOf(binding.etAmount.getText()).trim();
-        String title = String.valueOf(binding.etTitle.getText()).trim();
+        String amountStr = binding.etAmount.getText().toString().trim();
+        String title = binding.etTitle.getText().toString().trim();
         String type = binding.toggleGroup.getCheckedButtonId() == R.id.btn_expense ? "EXPENSE" : "INCOME";
 
         if (amountStr.isEmpty() || title.isEmpty()) {
@@ -98,22 +99,15 @@ public class AddTransactionActivity extends AppCompatActivity {
         try {
             double inputAmount = Double.parseDouble(amountStr);
             double rate = AppSettings.getExchangeRate(this);
-            double amountVnd = inputAmount / rate;
-
-            String category = String.valueOf(binding.actvCategory.getText()).trim();
-
+            double amountVnd = inputAmount / rate; // Convert back to VND for base storage
+            
+            String category = binding.actvCategory.getText().toString().trim();
+            
             Transaction transaction = new Transaction(0, title, amountVnd, category, System.currentTimeMillis(), "", type);
             viewModel.insert(transaction);
-            if ("EXPENSE".equals(type)) {
-                // (Giữ nguyên giả lập để test)
-                double soTienConLai = -50000;
-                NotificationHelper.checkAndSendBudgetNotification(this, soTienConLai);
-            } else if ("INCOME".equals(type)) {
-                NotificationHelper.sendIncomeNotification(this, amountVnd, title);
-            }
+            
             Toast.makeText(this, "Đã lưu: " + title, Toast.LENGTH_SHORT).show();
             finish();
-
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Số tiền không hợp lệ", Toast.LENGTH_SHORT).show();
         }

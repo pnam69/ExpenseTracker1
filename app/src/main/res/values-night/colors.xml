@@ -1,15 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Background and Neutral - Dark Mode -->
-    <color name="background">#0F172A</color>
-    <color name="background_alt">#1E293B</color>
-    <color name="surface">#1E293B</color>
-    <color name="surface_variant">#334155</color>
-    <color name="outline">#334155</color>
-    <color name="outline_variant">#475569</color>
+    <!-- Brand Colors - Dark Mode (Material 3 Style) -->
+    <color name="primary">#A8C7FF</color> <!-- Light Blue 200 -->
+    <color name="on_primary">#003062</color>
+    <color name="primary_container">#00478E</color>
+    <color name="on_primary_container">#D6E3FF</color>
+    <color name="on_primary_variant">#D6E3FF</color>
 
-    <!-- Text Colors - Dark Mode -->
-    <color name="text_primary">#F8FAFC</color>
-    <color name="text_secondary">#94A3B8</color>
-    <color name="text_tertiary">#64748B</color>
+    <color name="secondary">#6EE7B7</color> <!-- Emerald 300 -->
+    <color name="on_secondary">#003822</color>
+    <color name="secondary_container">#005234</color>
+    <color name="on_secondary_container">#8BF8C4</color>
+
+    <color name="error">#FFB4AB</color> <!-- Red 200 -->
+    <color name="on_error">#690005</color>
+    <color name="error_container">#93000A</color>
+    <color name="on_error_container">#FFDAD6</color>
+
+    <!-- Background and Neutral - Dark Mode -->
+    <color name="background">#1A1C1E</color>
+    <color name="surface">#1A1C1E</color>
+    <color name="surface_variant">#43474E</color>
+    <color name="on_surface">#E2E2E6</color>
+    <color name="outline">#8D9199</color>
+
+    <!-- Custom Semantic Colors -->
+    <color name="text_primary">#E2E2E6</color>
+    <color name="text_secondary">#C3C6CF</color>
+    <color name="text_tertiary">#8D9199</color>
 </resources>

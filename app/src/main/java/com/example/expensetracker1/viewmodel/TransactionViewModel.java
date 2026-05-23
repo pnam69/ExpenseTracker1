@@ -46,8 +46,25 @@ public class TransactionViewModel extends AndroidViewModel {
         return transactionDao.getTodayExpenses(startOfDay, endOfDay);
     }
 
+    public LiveData<Double> getMonthExpenses(long startOfMonth) {
+        return transactionDao.getMonthExpenses(startOfMonth);
+    }
+
+    public LiveData<List<Transaction>> getTransactionsByDateRange(long start, long end) {
+        // Method to facilitate better time-based filtering in ViewModel if needed
+        return allTransactions; // Simple placeholder or implement DAO method if more scale is needed
+    }
+
     public void insert(Transaction transaction) {
         executorService.execute(() -> transactionDao.insert(transaction));
+    }
+
+    public void update(Transaction transaction) {
+        executorService.execute(() -> transactionDao.update(transaction));
+    }
+
+    public LiveData<Transaction> getTransactionById(int id) {
+        return transactionDao.getTransactionById(id);
     }
 
     public void delete(Transaction transaction) {

@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -17,7 +18,7 @@ import com.example.expensetracker1.viewmodel.TransactionViewModel;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.utils.ColorTemplate;
+import com.google.android.material.datepicker.MaterialDatePicker;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -30,6 +31,8 @@ public class StatisticsFragment extends Fragment {
     private FragmentStatisticsBinding binding;
     private TransactionViewModel viewModel;
     private List<Transaction> allTransactions = new ArrayList<>();
+    private long customStartMillis = -1;
+    private long customEndMillis = -1;
 
     @Nullable
     @Override
@@ -42,8 +45,7 @@ public class StatisticsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        viewModel = new ViewModelProvider(this)
-                .get(TransactionViewModel.class);
+        viewModel = new ViewModelProvider(this).get(TransactionViewModel.class);
         
         viewModel.getAllTransactions().observe(getViewLifecycleOwner(), transactions -> {
             if (transactions != null) {
@@ -52,12 +54,18 @@ public class StatisticsFragment extends Fragment {
             }
         });
 
-        binding.chipGroupTime.setOnCheckedStateChangeListener((group, checkedIds) -> applyFilters());
+        binding.chipGroupTime.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            if (checkedIds.contains(R.id.chip_custom)) {
+                showDateRangePicker();
+            } else {
+                applyFilters();
+            }
+        });
         binding.chipGroupType.setOnCheckedStateChangeListener((group, checkedIds) -> applyFilters());
     }
 
     private void applyFilters() {
-        if (allTransactions == null) return;
+        if (allTransactions == null || binding == null) return;
 
         int timeId = binding.chipGroupTime.getCheckedChipId();
         List<Transaction> filtered = new ArrayList<>();
@@ -93,6 +101,17 @@ public class StatisticsFragment extends Fragment {
             for (Transaction t : allTransactions) {
                 if (t.getDate() >= startOfWeek) filtered.add(t);
             }
+        } else if (timeId == R.id.chip_custom) {
+            if (customStartMillis != -1 && customEndMillis != -1) {
+                for (Transaction t : allTransactions) {
+                    if (t.getDate() >= customStartMillis && t.getDate() <= customEndMillis) {
+                        filtered.add(t);
+                    }
+                }
+            } else {
+                showDateRangePicker();
+                return;
+            }
         } else {
             filtered = allTransactions;
         }
@@ -100,8 +119,25 @@ public class StatisticsFragment extends Fragment {
         updateUI(filtered);
     }
 
+    private void showDateRangePicker() {
+        MaterialDatePicker<androidx.core.util.Pair<Long, Long>> picker = MaterialDatePicker.Builder.dateRangePicker()
+                .setTitleText(R.string.dialog_date_range_title)
+                .build();
+        
+        picker.addOnPositiveButtonClickListener(selection -> {
+            if (selection != null) {
+                customStartMillis = selection.first;
+                customEndMillis = selection.second;
+                applyFilters();
+            }
+        });
+        
+        picker.show(getChildFragmentManager(), "DATE_RANGE_PICKER");
+    }
+
     private void updateUI(List<Transaction> transactions) {
-        if (transactions == null) return;
+        android.content.Context context = getContext();
+        if (transactions == null || context == null || binding == null) return;
 
         double income = 0;
         double expense = 0;
@@ -125,27 +161,70 @@ public class StatisticsFragment extends Fragment {
             }
         }
 
-        binding.tvTotalIncome.setText(AppSettings.formatAmount(requireContext(), income));
-        binding.tvTotalExpenses.setText(AppSettings.formatAmount(requireContext(), expense));
+        binding.tvTotalIncome.setText(AppSettings.formatAmount(context, income));
+        binding.tvTotalExpenses.setText(AppSettings.formatAmount(context, expense));
 
-        setupPieChart(categoryMap, targetType);
+        setupPieChart(context, categoryMap, targetType);
+        generateInsight(categoryMap, income, expense, targetType);
     }
 
-    private void setupPieChart(Map<String, Double> categoryMap, String type) {
+    private void generateInsight(Map<String, Double> categoryMap, double income, double expense, String type) {
+        if (categoryMap.isEmpty()) {
+            binding.tvInsightText.setText(R.string.stats_no_data);
+            return;
+        }
+
+        if ("EXPENSE".equals(type)) {
+            String topCategory = "";
+            double maxAmount = 0;
+            for (Map.Entry<String, Double> entry : categoryMap.entrySet()) {
+                if (entry.getValue() > maxAmount) {
+                    maxAmount = entry.getValue();
+                    topCategory = entry.getKey();
+                }
+            }
+
+            int percent = (expense > 0) ? (int) ((maxAmount / expense) * 100) : 0;
+            String insight = getString(R.string.stats_insight_expense, percent, topCategory);
+            binding.tvInsightText.setText(insight);
+        } else {
+            binding.tvInsightText.setText(R.string.stats_insight_income);
+        }
+    }
+
+    private void setupPieChart(android.content.Context context, Map<String, Double> categoryMap, String type) {
         List<PieEntry> entries = new ArrayList<>();
         for (Map.Entry<String, Double> entry : categoryMap.entrySet()) {
             entries.add(new PieEntry(entry.getValue().floatValue(), entry.getKey()));
         }
 
         PieDataSet dataSet = new PieDataSet(entries, "");
-        dataSet.setColors(ColorTemplate.MATERIAL_COLORS);
+        
+        int[] softColors = {
+            android.graphics.Color.parseColor("#60A5FA"),
+            android.graphics.Color.parseColor("#34D399"),
+            android.graphics.Color.parseColor("#F87171"),
+            android.graphics.Color.parseColor("#FBBF24"),
+            android.graphics.Color.parseColor("#818CF8"),
+            android.graphics.Color.parseColor("#A78BFA")
+        };
+        dataSet.setColors(softColors);
+        
         dataSet.setValueTextSize(12f);
         dataSet.setValueTextColor(android.graphics.Color.WHITE);
 
         PieData data = new PieData(dataSet);
         binding.pieChart.setData(data);
         binding.pieChart.getDescription().setEnabled(false);
+        
+        int textColor = ContextCompat.getColor(context, R.color.text_primary);
+        int holeColor = ContextCompat.getColor(context, R.color.surface);
+        
         binding.pieChart.setCenterText("INCOME".equals(type) ? "Thu nhập" : "Chi tiêu");
+        binding.pieChart.setCenterTextColor(textColor);
+        binding.pieChart.setHoleColor(holeColor);
+        binding.pieChart.getLegend().setTextColor(textColor);
+
         binding.pieChart.invalidate();
     }
 

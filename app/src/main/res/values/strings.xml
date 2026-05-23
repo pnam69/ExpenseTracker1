@@ -8,6 +8,7 @@
     <string name="savings_goal_title">Quỹ dự phòng &amp; Mục tiêu</string>
     <string name="budget_warning_safe">Kế hoạch tài chính đang ổn định</string>
     <string name="budget_warning_danger">Cảnh báo: Đã chạm 85%% hạn mức chi tiêu!</string>
+    <string name="budget_over_limit">Bạn đã chi tiêu vượt hạn mức ngày!</string>
 
     <!-- Statistics -->
     <string name="stats_title">Phân tích chi tiêu</string>
@@ -24,13 +25,21 @@
     <string name="settings_profile">Hồ sơ cá nhân</string>
     <string name="settings_currency">Đơn vị tiền tệ</string>
     <string name="settings_daily_limit">Hạn mức chi tiêu ngày</string>
+    <string name="settings_emergency_goal">Mục tiêu Quỹ dự phòng</string>
     <string name="settings_notifications">Thông báo nhắc nhở</string>
     <string name="settings_dark_mode">Chế độ tối</string>
     <string name="settings_data_reset">Xoá toàn bộ dữ liệu</string>
     <string name="settings_about">Về ứng dụng</string>
+    <string name="profile_title">Hồ sơ cá nhân</string>
+    <string name="profile_name_hint">Họ và tên</string>
+    <string name="profile_email_hint">Email</string>
+    <string name="profile_save">Cập nhật hồ sơ</string>
+    <string name="profile_updated">Đã cập nhật thông tin</string>
+    <string name="profile_user_name_default">Người dùng</string>
+    <string name="acc_profile_avatar">Ảnh đại diện</string>
 
     <!-- Dashboard -->
-    <string name="dashboard_greeting">Chào buổi sáng!</string>
+    <string name="dashboard_greeting">Chào mừng, %s!</string>
     <string name="chip_meal">🍱 Ăn uống</string>
     <string name="chip_market">🛒 Đi chợ</string>
     <string name="chip_fuel">⛽ Đổ xăng</string>
@@ -50,10 +59,52 @@
     <string name="empty_history_title">Không tìm thấy giao dịch</string>
     <string name="empty_history_desc">Hãy thử thay đổi từ khoá tìm kiếm hoặc bộ lọc</string>
     <string name="add_transaction">Thêm giao dịch</string>
+    <string name="splash_tagline">FinGuard • Secure &amp; Smart</string>
+    <string name="add_transaction_title">Ghi chép giao dịch</string>
+    <string name="label_amount">Số tiền</string>
+    <string name="label_note">Nội dung chi tiêu</string>
+    <string name="label_category">Phân loại</string>
+    <string name="label_date">Ngày giao dịch</string>
+    <string name="type_expense">Chi tiền</string>
+    <string name="type_income">Thu tiền</string>
+    <string name="btn_save">Lưu giao dịch</string>
+    <string name="msg_empty_fields">Vui lòng nhập đầy đủ thông tin</string>
+    <string name="msg_invalid_amount">Số tiền không hợp lệ</string>
+    <string name="msg_saved_success">Đã lưu: %s</string>
+    <string name="msg_profile_incomplete">Hồ sơ cá nhân đang được hoàn thiện</string>
+    <string name="msg_currency_updated">Đã cập nhật: %s</string>
+    <string name="msg_limit_updated">Đã cập nhật hạn mức</string>
+    <string name="msg_limit_invalid">Giá trị hạn mức không hợp lệ</string>
+    <string name="msg_limit_positive">Hạn mức phải lớn hơn 0</string>
+    <string name="dialog_currency_title">Chọn đơn vị tiền tệ</string>
+    <string name="dialog_limit_title">Thiết lập hạn mức chi tiêu</string>
+    <string name="dialog_limit_message">Hạn mức này sẽ được dùng để tính số tiền còn lại trong ngày (%s).</string>
+    <string name="dialog_reset_title">Xác nhận xoá</string>
+    <string name="dialog_reset_message">Bạn có chắc chắn muốn xoá toàn bộ dữ liệu giao dịch không? Hành động này không thể hoàn tác.</string>
+    <string name="dialog_reset_positive">Xoá tất cả</string>
+    <string name="msg_data_cleared">Dữ liệu đã được xoá</string>
+    <string name="cancel">Huỷ</string>
+    <string name="save">Lưu</string>
 
     <!-- Stats Filters -->
     <string name="stats_filter_all">Tất cả</string>
     <string name="stats_filter_month">Tháng này</string>
     <string name="stats_filter_week">Tuần này</string>
     <string name="stats_filter_today">Hôm nay</string>
+    <string name="stats_filter_custom">Tuỳ chọn</string>
+    <string name="stats_no_data">Chưa có dữ liệu để phân tích.</string>
+    <string name="stats_insight_expense">Bạn đã chi %1$d%% ngân sách cho %2$s. Hãy cân nhắc tối ưu hóa hạng mục này để tiết kiệm thêm.</string>
+    <string name="stats_insight_income">Tuyệt vời! Bạn đang có nguồn thu nhập đa dạng. Hãy tiếp tục duy trì thói quen ghi chép.</string>
+    <string name="dialog_sort_title">Sắp xếp giao dịch</string>
+    <string name="sort_newest">Mới nhất</string>
+    <string name="sort_oldest">Cũ nhất</string>
+    <string name="sort_amount_desc">Số tiền (Cao - Thấp)</string>
+    <string name="sort_amount_asc">Số tiền (Thấp - Cao)</string>
+    <string name="dialog_delete_title">Xoá giao dịch</string>
+    <string name="dialog_delete_msg">Bạn có chắc chắn muốn xoá giao dịch này?</string>
+    <string name="delete">Xoá</string>
+    <string name="msg_deleted">Đã xoá giao dịch</string>
+    <string name="btn_delete_transaction">Xoá giao dịch này</string>
+    <string name="category_dining">Ăn uống</string>
+    <string name="dialog_date_range_title">Chọn khoảng thời gian</string>
 </resources>

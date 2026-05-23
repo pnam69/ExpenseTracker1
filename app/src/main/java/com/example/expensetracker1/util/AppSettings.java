@@ -12,10 +12,14 @@ public final class AppSettings {
     private static final String KEY_CURRENCY_LABEL = "currency_label";
     private static final String KEY_CURRENCY_SYMBOL = "currency_symbol";
     private static final String KEY_DAILY_LIMIT = "daily_limit";
+    private static final String KEY_EMERGENCY_GOAL = "emergency_goal";
+    private static final String KEY_USER_NAME = "user_name";
+    private static final String KEY_USER_EMAIL = "user_email";
 
     public static final String DEFAULT_CURRENCY_LABEL = "Việt Nam Đồng (VND)";
     public static final String DEFAULT_CURRENCY_SYMBOL = "đ";
-    public static final double DEFAULT_DAILY_LIMIT = 200_000.0;
+    public static final double DEFAULT_DAILY_LIMIT = 500_000.0;
+    public static final double DEFAULT_EMERGENCY_GOAL = 15_000_000.0;
 
     private AppSettings() {
     }
@@ -48,14 +52,47 @@ public final class AppSettings {
     }
 
     public static double getDailyLimit(Context context) {
-        return Double.longBitsToDouble(
-                prefs(context).getLong(KEY_DAILY_LIMIT, Double.doubleToRawLongBits(DEFAULT_DAILY_LIMIT))
-        );
+        String limitStr = prefs(context).getString(KEY_DAILY_LIMIT, String.valueOf(DEFAULT_DAILY_LIMIT));
+        try {
+            double limit = Double.parseDouble(limitStr);
+            return limit > 0 ? limit : DEFAULT_DAILY_LIMIT;
+        } catch (Exception e) {
+            return DEFAULT_DAILY_LIMIT;
+        }
     }
 
     public static void setDailyLimit(Context context, double dailyLimit) {
         double sanitizedLimit = Math.max(0.0, dailyLimit);
-        prefs(context).edit().putLong(KEY_DAILY_LIMIT, Double.doubleToRawLongBits(sanitizedLimit)).apply();
+        prefs(context).edit().putString(KEY_DAILY_LIMIT, String.valueOf(sanitizedLimit)).apply();
+    }
+
+    public static double getEmergencyGoal(Context context) {
+        String goalStr = prefs(context).getString(KEY_EMERGENCY_GOAL, String.valueOf(DEFAULT_EMERGENCY_GOAL));
+        try {
+            return Double.parseDouble(goalStr);
+        } catch (Exception e) {
+            return DEFAULT_EMERGENCY_GOAL;
+        }
+    }
+
+    public static void setEmergencyGoal(Context context, double goal) {
+        prefs(context).edit().putString(KEY_EMERGENCY_GOAL, String.valueOf(goal)).apply();
+    }
+
+    public static String getUserName(Context context) {
+        return prefs(context).getString(KEY_USER_NAME, "Người dùng");
+    }
+
+    public static void setUserName(Context context, String name) {
+        prefs(context).edit().putString(KEY_USER_NAME, name).apply();
+    }
+
+    public static String getUserEmail(Context context) {
+        return prefs(context).getString(KEY_USER_EMAIL, "user@example.com");
+    }
+
+    public static void setUserEmail(Context context, String email) {
+        prefs(context).edit().putString(KEY_USER_EMAIL, email).apply();
     }
 
     public static double getExchangeRate(Context context) {
