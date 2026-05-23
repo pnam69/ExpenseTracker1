@@ -68,6 +68,8 @@
     <string name="type_expense">Chi tiền</string>
     <string name="type_income">Thu tiền</string>
     <string name="btn_save">Lưu giao dịch</string>
+    <string name="btn_update">Cập nhật</string>
+    <string name="edit_transaction_title">Chỉnh sửa giao dịch</string>
     <string name="msg_empty_fields">Vui lòng nhập đầy đủ thông tin</string>
     <string name="msg_invalid_amount">Số tiền không hợp lệ</string>
     <string name="msg_saved_success">Đã lưu: %s</string>
@@ -104,6 +106,7 @@
     <string name="dialog_delete_msg">Bạn có chắc chắn muốn xoá giao dịch này?</string>
     <string name="delete">Xoá</string>
     <string name="msg_deleted">Đã xoá giao dịch</string>
+    <string name="dialog_delete_confirm">Bạn có chắc muốn xoá giao dịch này?</string>
     <string name="btn_delete_transaction">Xoá giao dịch này</string>
     <string name="category_dining">Ăn uống</string>
     <string name="dialog_date_range_title">Chọn khoảng thời gian</string>

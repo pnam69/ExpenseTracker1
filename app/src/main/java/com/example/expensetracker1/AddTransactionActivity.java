@@ -15,6 +15,7 @@ import com.example.expensetracker1.viewmodel.TransactionViewModel;
 
 public class AddTransactionActivity extends AppCompatActivity {
 
+    public static final String EXTRA_ID = "extra_id";
     public static final String EXTRA_TITLE = "extra_title";
     public static final String EXTRA_AMOUNT = "extra_amount";
     public static final String EXTRA_CATEGORY = "extra_category";
@@ -22,6 +23,7 @@ public class AddTransactionActivity extends AppCompatActivity {
 
     private ActivityAddTransactionBinding binding;
     private TransactionViewModel viewModel;
+    private int transactionId = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,11 +33,60 @@ public class AddTransactionActivity extends AppCompatActivity {
 
         viewModel = new ViewModelProvider(this)
                 .get(TransactionViewModel.class);
+        
+        transactionId = getIntent().getIntExtra(EXTRA_ID, 0);
+
         setupToolbar();
         setupCategoryDropdown();
-        applyPresetFromIntent();
+        
+        if (transactionId != 0) {
+            loadTransactionData();
+            binding.btnSave.setText(R.string.btn_update);
+            binding.btnDelete.setVisibility(android.view.View.VISIBLE);
+        } else {
+            applyPresetFromIntent();
+        }
 
         binding.btnSave.setOnClickListener(v -> saveTransaction());
+        binding.btnDelete.setOnClickListener(v -> deleteTransaction());
+    }
+
+    private void loadTransactionData() {
+        viewModel.getTransactionById(transactionId).observe(this, transaction -> {
+            if (transaction != null) {
+                binding.etTitle.setText(transaction.getTitle());
+                
+                double rate = AppSettings.getExchangeRate(this);
+                double converted = transaction.getAmount() * rate;
+                binding.etAmount.setText(formatAmount(converted));
+                
+                binding.actvCategory.setText(transaction.getCategory(), false);
+                
+                if ("INCOME".equalsIgnoreCase(transaction.getType())) {
+                    binding.toggleGroup.check(R.id.btn_income);
+                } else {
+                    binding.toggleGroup.check(R.id.btn_expense);
+                }
+                
+                binding.toolbar.setTitle(R.string.edit_transaction_title);
+            }
+        });
+    }
+
+    private void deleteTransaction() {
+        viewModel.getTransactionById(transactionId).observe(this, transaction -> {
+            if (transaction != null) {
+                new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                        .setTitle(R.string.dialog_delete_title)
+                        .setMessage(R.string.dialog_delete_confirm)
+                        .setPositiveButton(R.string.delete, (dialog, which) -> {
+                            viewModel.delete(transaction);
+                            finish();
+                        })
+                        .setNegativeButton(R.string.cancel, null)
+                        .show();
+            }
+        });
     }
 
     private void setupCategoryDropdown() {
@@ -99,14 +150,19 @@ public class AddTransactionActivity extends AppCompatActivity {
         try {
             double inputAmount = Double.parseDouble(amountStr);
             double rate = AppSettings.getExchangeRate(this);
-            double amountVnd = inputAmount / rate; // Convert back to VND for base storage
+            double amountVnd = inputAmount / rate; 
             
             String category = binding.actvCategory.getText().toString().trim();
             
-            Transaction transaction = new Transaction(0, title, amountVnd, category, System.currentTimeMillis(), "", type);
-            viewModel.insert(transaction);
-            
-            Toast.makeText(this, "Đã lưu: " + title, Toast.LENGTH_SHORT).show();
+            if (transactionId != 0) {
+                Transaction transaction = new Transaction(transactionId, title, amountVnd, category, System.currentTimeMillis(), "", type);
+                viewModel.update(transaction);
+                Toast.makeText(this, "Đã cập nhật: " + title, Toast.LENGTH_SHORT).show();
+            } else {
+                Transaction transaction = new Transaction(0, title, amountVnd, category, System.currentTimeMillis(), "", type);
+                viewModel.insert(transaction);
+                Toast.makeText(this, "Đã lưu: " + title, Toast.LENGTH_SHORT).show();
+            }
             finish();
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Số tiền không hợp lệ", Toast.LENGTH_SHORT).show();

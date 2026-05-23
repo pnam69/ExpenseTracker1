@@ -64,4 +64,8 @@ public class MainActivity extends AppCompatActivity {
                 .replace(R.id.nav_host_fragment, fragment)
                 .commit();
     }
+
+    public void navigateToHistory() {
+        binding.bottomNavigation.setSelectedItemId(R.id.navigation_history);
+    }
 }
