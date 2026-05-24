@@ -3,11 +3,8 @@ package com.example.expensetracker1;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
-import java.util.Calendar;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.widget.ArrayAdapter;
@@ -55,7 +52,7 @@ public class AddTransactionActivity extends AppCompatActivity {
     }
 
     private void loadTransactionData() {
-        observeOnce(viewModel.getTransactionById(transactionId), transaction -> {
+        viewModel.getTransactionById(transactionId).observe(this, transaction -> {
             if (transaction != null) {
                 binding.etTitle.setText(transaction.getTitle());
                 
@@ -77,7 +74,7 @@ public class AddTransactionActivity extends AppCompatActivity {
     }
 
     private void deleteTransaction() {
-        observeOnce(viewModel.getTransactionById(transactionId), transaction -> {
+        viewModel.getTransactionById(transactionId).observe(this, transaction -> {
             if (transaction != null) {
                 new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
                         .setTitle(R.string.dialog_delete_title)
@@ -93,7 +90,10 @@ public class AddTransactionActivity extends AppCompatActivity {
     }
 
     private void setupCategoryDropdown() {
-        String[] categories = getResources().getStringArray(R.array.transaction_categories);
+        String[] categories = {
+                "Ăn uống", "Đi lại", "Mua sắm", "Nhà cửa", "Hoá đơn",
+                "Giải trí", "Sức khỏe", "Giáo dục", "Lương", "Thưởng", "Khác"
+        };
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, categories);
         binding.actvCategory.setAdapter(adapter);
     }
@@ -138,15 +138,12 @@ public class AddTransactionActivity extends AppCompatActivity {
     }
 
     private void saveTransaction() {
-        CharSequence amountInput = binding.etAmount.getText();
-        CharSequence titleInput = binding.etTitle.getText();
-
-        String amountStr = (amountInput != null) ? amountInput.toString().trim() : "";
-        String title = (titleInput != null) ? titleInput.toString().trim() : "";
+        String amountStr = binding.etAmount.getText().toString().trim();
+        String title = binding.etTitle.getText().toString().trim();
         String type = binding.toggleGroup.getCheckedButtonId() == R.id.btn_expense ? "EXPENSE" : "INCOME";
 
         if (amountStr.isEmpty() || title.isEmpty()) {
-            Toast.makeText(this, R.string.msg_empty_fields, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -155,60 +152,20 @@ public class AddTransactionActivity extends AppCompatActivity {
             double rate = AppSettings.getExchangeRate(this);
             double amountVnd = inputAmount / rate; 
             
-            CharSequence categoryInput = binding.actvCategory.getText();
-            String category = (categoryInput != null) ? categoryInput.toString().trim() : "";
+            String category = binding.actvCategory.getText().toString().trim();
             
             if (transactionId != 0) {
                 Transaction transaction = new Transaction(transactionId, title, amountVnd, category, System.currentTimeMillis(), "", type);
                 viewModel.update(transaction);
-                Toast.makeText(this, getString(R.string.msg_transaction_updated, title), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Đã cập nhật: " + title, Toast.LENGTH_SHORT).show();
             } else {
                 Transaction transaction = new Transaction(0, title, amountVnd, category, System.currentTimeMillis(), "", type);
                 viewModel.insert(transaction);
-                Toast.makeText(this, getString(R.string.msg_saved_success, title), Toast.LENGTH_SHORT).show();
-
-                // Send notification for new transaction
-                if ("INCOME".equals(type)) {
-                    NotificationHelper.sendIncomeNotification(this, amountVnd, title);
-                } else {
-                    notifyIfOverDailyLimit(amountVnd);
-                }
+                Toast.makeText(this, "Đã lưu: " + title, Toast.LENGTH_SHORT).show();
             }
             finish();
         } catch (NumberFormatException e) {
-            Toast.makeText(this, R.string.msg_invalid_amount, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Số tiền không hợp lệ", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    private void notifyIfOverDailyLimit(double newExpenseVnd) {
-        final double dailyLimit = AppSettings.getDailyLimit(this);
-        long startOfDay = getStartOfDayMillis();
-        long endOfDay = startOfDay + 24L * 60L * 60L * 1000L;
-
-        viewModel.getTodayExpensesValue(startOfDay, endOfDay, todayExpensesVnd -> {
-            double remaining = dailyLimit - (todayExpensesVnd + newExpenseVnd);
-            if (remaining <= 0) {
-                NotificationHelper.checkAndSendBudgetNotification(this, remaining);
-            }
-        });
-    }
-
-    private long getStartOfDayMillis() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        return calendar.getTimeInMillis();
-    }
-
-    private <T> void observeOnce(LiveData<T> liveData, Observer<T> observer) {
-        liveData.observe(this, new Observer<T>() {
-            @Override
-            public void onChanged(T value) {
-                observer.onChanged(value);
-                liveData.removeObserver(this);
-            }
-        });
     }
 }

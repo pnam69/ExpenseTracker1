@@ -17,6 +17,10 @@ import android.widget.Toast;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+// ĐÃ THÊM: 2 thư viện để kiểm tra quyền thông báo
+import androidx.core.content.ContextCompat;
+import android.content.pm.PackageManager;
+
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
@@ -96,7 +100,9 @@ public class SettingsFragment extends Fragment {
                 return;
             }
 
-            if (NotificationHelper.isNotificationPermissionGranted(requireContext())) {
+            // ĐÃ SỬA LỖI 1: Thay NotificationHelper bằng hàm kiểm tra chuẩn của Android
+            boolean isGranted = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
+            if (isGranted) {
                 Toast.makeText(requireContext(), R.string.msg_notifications_enabled, Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -127,7 +133,8 @@ public class SettingsFragment extends Fragment {
             return;
         }
 
-        boolean granted = NotificationHelper.isNotificationPermissionGranted(requireContext());
+        // ĐÃ SỬA LỖI 1: Tương tự như trên
+        boolean granted = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
         binding.tvNotificationStatus.setText(granted ? R.string.notification_status_enabled : R.string.notification_status_disabled);
     }
 
@@ -266,10 +273,10 @@ public class SettingsFragment extends Fragment {
                 .setTitle(R.string.dialog_reset_title)
                 .setMessage(R.string.dialog_reset_message)
                 .setPositiveButton(R.string.dialog_reset_positive, (dialog, which) -> {
-                    viewModel.deleteAllTransactions(() -> {
-                        Toast.makeText(requireContext(), R.string.msg_data_cleared, Toast.LENGTH_SHORT).show();
-                        requireActivity().recreate();
-                    });
+                    // ĐÃ SỬA LỖI 2: Tách riêng hàm gọi xóa và các lệnh cập nhật giao diện
+                    viewModel.deleteAllTransactions();
+                    Toast.makeText(requireContext(), R.string.msg_data_cleared, Toast.LENGTH_SHORT).show();
+                    requireActivity().recreate();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show();

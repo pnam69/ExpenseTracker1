@@ -18,8 +18,8 @@ public final class AppSettings {
 
     public static final String DEFAULT_CURRENCY_LABEL = "Việt Nam Đồng (VND)";
     public static final String DEFAULT_CURRENCY_SYMBOL = "đ";
-    public static final double DEFAULT_DAILY_LIMIT = 500_000.0;
-    public static final double DEFAULT_EMERGENCY_GOAL = 15_000_000.0;
+    public static final double DEFAULT_DAILY_LIMIT = 0;
+    public static final double DEFAULT_EMERGENCY_GOAL = 0;
 
     private AppSettings() {
     }
@@ -52,10 +52,14 @@ public final class AppSettings {
     }
 
     public static double getDailyLimit(Context context) {
-        String limitStr = prefs(context).getString(KEY_DAILY_LIMIT, String.valueOf(DEFAULT_DAILY_LIMIT));
         try {
+            String limitStr = prefs(context).getString(KEY_DAILY_LIMIT, String.valueOf(DEFAULT_DAILY_LIMIT));
             double limit = Double.parseDouble(limitStr);
             return limit > 0 ? limit : DEFAULT_DAILY_LIMIT;
+        } catch (ClassCastException e) {
+            long oldLimit = prefs(context).getLong(KEY_DAILY_LIMIT, (long) DEFAULT_DAILY_LIMIT);
+            setDailyLimit(context, (double) oldLimit);
+            return oldLimit > 0 ? (double) oldLimit : DEFAULT_DAILY_LIMIT;
         } catch (Exception e) {
             return DEFAULT_DAILY_LIMIT;
         }
@@ -67,9 +71,13 @@ public final class AppSettings {
     }
 
     public static double getEmergencyGoal(Context context) {
-        String goalStr = prefs(context).getString(KEY_EMERGENCY_GOAL, String.valueOf(DEFAULT_EMERGENCY_GOAL));
         try {
+            String goalStr = prefs(context).getString(KEY_EMERGENCY_GOAL, String.valueOf(DEFAULT_EMERGENCY_GOAL));
             return Double.parseDouble(goalStr);
+        } catch (ClassCastException e) {
+            long oldGoal = prefs(context).getLong(KEY_EMERGENCY_GOAL, (long) DEFAULT_EMERGENCY_GOAL);
+            setEmergencyGoal(context, (double) oldGoal);
+            return (double) oldGoal;
         } catch (Exception e) {
             return DEFAULT_EMERGENCY_GOAL;
         }
@@ -119,4 +127,3 @@ public final class AppSettings {
         return symbol + formatted;
     }
 }
-

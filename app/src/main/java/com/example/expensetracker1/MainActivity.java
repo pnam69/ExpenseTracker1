@@ -105,8 +105,9 @@ public class MainActivity extends AppCompatActivity {
         if (menuItemId == R.id.navigation_settings) return "settings";
         return "dashboard";
     }
-
     public void navigateToHistory() {
-        binding.bottomNavigation.setSelectedItemId(R.id.navigation_history);
+        if (binding != null && binding.bottomNavigation != null) {
+            binding.bottomNavigation.setSelectedItemId(R.id.navigation_history);
+        }
     }
 }
