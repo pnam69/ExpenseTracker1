@@ -5,11 +5,27 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Build;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
+import android.content.pm.PackageManager;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
 public class NotificationHelper {
+
+    /**
+     * Check if the app has permission to post notifications on Android 13+
+     * Returns false only if we're on Android 13+ AND the permission is not granted
+     */
+    private static boolean shouldNotifyAboutPermission(Context context) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            // Permission not required before Android 13
+            return false; // Don't need to check, can proceed
+        }
+        // Android 13+ - check if permission is NOT granted
+        return ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED;
+    }
 
     private static String getCurrentTime() {
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy", Locale.getDefault());
@@ -17,6 +33,11 @@ public class NotificationHelper {
     }
 
     public static void checkAndSendBudgetNotification(Context context, double hanMucConLai) {
+        // Skip if notification permission is required but not granted (Android 13+)
+        if (shouldNotifyAboutPermission(context)) {
+            return;
+        }
+
         String title;
         String message;
         String timeStr = getCurrentTime();
@@ -62,6 +83,11 @@ public class NotificationHelper {
     }
 
     public static void sendIncomeNotification(Context context, double soTienThu, String tenKhoanThu) {
+        // Skip if notification permission is required but not granted (Android 13+)
+        if (shouldNotifyAboutPermission(context)) {
+            return;
+        }
+
         String title = "Tiền về! \uD83C\uDF89";
         String soTienChu = (soTienThu == (long) soTienThu) ? String.valueOf((long) soTienThu) : String.valueOf(soTienThu);
         String timeStr = getCurrentTime();

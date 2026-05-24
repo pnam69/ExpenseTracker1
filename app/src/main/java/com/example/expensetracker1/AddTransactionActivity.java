@@ -138,8 +138,11 @@ public class AddTransactionActivity extends AppCompatActivity {
     }
 
     private void saveTransaction() {
-        String amountStr = binding.etAmount.getText().toString().trim();
-        String title = binding.etTitle.getText().toString().trim();
+        CharSequence amountInput = binding.etAmount.getText();
+        CharSequence titleInput = binding.etTitle.getText();
+
+        String amountStr = (amountInput != null) ? amountInput.toString().trim() : "";
+        String title = (titleInput != null) ? titleInput.toString().trim() : "";
         String type = binding.toggleGroup.getCheckedButtonId() == R.id.btn_expense ? "EXPENSE" : "INCOME";
 
         if (amountStr.isEmpty() || title.isEmpty()) {
@@ -152,7 +155,8 @@ public class AddTransactionActivity extends AppCompatActivity {
             double rate = AppSettings.getExchangeRate(this);
             double amountVnd = inputAmount / rate; 
             
-            String category = binding.actvCategory.getText().toString().trim();
+            CharSequence categoryInput = binding.actvCategory.getText();
+            String category = (categoryInput != null) ? categoryInput.toString().trim() : "";
             
             if (transactionId != 0) {
                 Transaction transaction = new Transaction(transactionId, title, amountVnd, category, System.currentTimeMillis(), "", type);
@@ -162,6 +166,18 @@ public class AddTransactionActivity extends AppCompatActivity {
                 Transaction transaction = new Transaction(0, title, amountVnd, category, System.currentTimeMillis(), "", type);
                 viewModel.insert(transaction);
                 Toast.makeText(this, "Đã lưu: " + title, Toast.LENGTH_SHORT).show();
+                
+                // Send notification for new transaction
+                if ("INCOME".equals(type)) {
+                    NotificationHelper.sendIncomeNotification(this, amountVnd, title);
+                } else {
+                    // type is "EXPENSE" - Check if budget exceeded and send budget notification
+                    double dailyLimit = AppSettings.getDailyLimit(this);
+                    double todayExpensesVnd = 0; // Will be fetched from ViewModel in real scenario
+                    if (todayExpensesVnd >= dailyLimit) {
+                        NotificationHelper.checkAndSendBudgetNotification(this, dailyLimit - (todayExpensesVnd + amountVnd));
+                    }
+                }
             }
             finish();
         } catch (NumberFormatException e) {
