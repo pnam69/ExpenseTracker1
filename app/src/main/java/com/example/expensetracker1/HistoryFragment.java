@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -25,8 +24,6 @@ import android.text.TextWatcher;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class HistoryFragment extends Fragment {
 
@@ -107,21 +104,32 @@ public class HistoryFragment extends Fragment {
     }
 
     private void applyFilters() {
-        String query = binding.etSearch.getText().toString().toLowerCase();
+        if (binding == null) return;
+        String query = binding.etSearch.getText().toString().toLowerCase().trim();
         int checkedId = binding.chipGroupFilters.getCheckedChipId();
 
         List<Transaction> filtered = new ArrayList<>();
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        long startOfMonth = calendar.getTimeInMillis();
+        // Logic for "This Month" and "Today" start in local time
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        long startOfToday = cal.getTimeInMillis();
+
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+        long startOfMonth = cal.getTimeInMillis();
 
         for (Transaction t : allTransactions) {
+            // 1. Search filter
             boolean matchesSearch = query.isEmpty() || 
                     (t.getTitle() != null && t.getTitle().toLowerCase().contains(query)) ||
                     (t.getCategory() != null && t.getCategory().toLowerCase().contains(query));
             
+            if (!matchesSearch) continue;
+
+            // 2. Chip filter (Simplified)
             boolean matchesChip = true;
             if (checkedId == R.id.chip_expense) {
                 matchesChip = "EXPENSE".equals(t.getType());
@@ -129,9 +137,11 @@ public class HistoryFragment extends Fragment {
                 matchesChip = "INCOME".equals(t.getType());
             } else if (checkedId == R.id.chip_this_month) {
                 matchesChip = t.getDate() >= startOfMonth;
+            } else if (checkedId == R.id.chip_today) {
+                matchesChip = t.getDate() >= startOfToday;
             }
             
-            if (matchesSearch && matchesChip) {
+            if (matchesChip) {
                 filtered.add(t);
             }
         }
@@ -141,9 +151,9 @@ public class HistoryFragment extends Fragment {
             switch (currentSortOrder) {
                 case 1: // Oldest
                     return Long.compare(t1.getDate(), t2.getDate());
-                case 2: // High -> Low
+                case 2: // High -> Low (Amount)
                     return Double.compare(t2.getAmount(), t1.getAmount());
-                case 3: // Low -> High
+                case 3: // Low -> High (Amount)
                     return Double.compare(t1.getAmount(), t2.getAmount());
                 default: // Newest
                     return Long.compare(t2.getDate(), t1.getDate());
@@ -170,7 +180,7 @@ public class HistoryFragment extends Fragment {
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                int position = viewHolder.getAdapterPosition();
+                int position = viewHolder.getBindingAdapterPosition();
                 Transaction transaction = adapter.getTransactionAt(position);
                 showDeleteDialog(transaction);
                 // Need to notify adapter to restore the item if user cancels, or just refresh
@@ -190,9 +200,7 @@ public class HistoryFragment extends Fragment {
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.dialog_delete_title)
                 .setMessage(getString(R.string.dialog_delete_msg))
-                .setPositiveButton(R.string.delete, (dialog, which) -> {
-                    viewModel.delete(transaction);
-                })
+                .setPositiveButton(R.string.delete, (dialog, which) -> viewModel.delete(transaction))
                 .setNegativeButton(R.string.cancel, null)
                 .show();
     }

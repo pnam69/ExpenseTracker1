@@ -229,8 +229,9 @@ public class DashboardFragment extends Fragment {
         if (emergencyPercent > 100) emergencyPercent = 100;
 
         binding.progressEmergency.setProgress(emergencyPercent);
+        double displayedBalance = Math.min(Math.max(0, totalBalance), emergencyGoal);
         binding.tvEmergencyProgress.setText(String.format("%s / %s",
-                AppSettings.formatAmount(context, Math.max(0, totalBalance)),
+                AppSettings.formatAmount(context, displayedBalance),
                 AppSettings.formatAmount(context, emergencyGoal)));
 
         if (remainingValue < 0) {

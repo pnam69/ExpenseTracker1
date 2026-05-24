@@ -18,8 +18,8 @@ public final class AppSettings {
 
     public static final String DEFAULT_CURRENCY_LABEL = "Việt Nam Đồng (VND)";
     public static final String DEFAULT_CURRENCY_SYMBOL = "đ";
-    public static final double DEFAULT_DAILY_LIMIT = 0;
-    public static final double DEFAULT_EMERGENCY_GOAL = 0;
+    public static final double DEFAULT_DAILY_LIMIT = 500000.0;
+    public static final double DEFAULT_EMERGENCY_GOAL = 15000000.0;
 
     private AppSettings() {
     }

@@ -34,43 +34,39 @@
             android:layout_marginTop="8dp">
 
             <LinearLayout
+                android:id="@+id/btn_profile"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="16dp">
 
-                <LinearLayout
-                    android:id="@+id/btn_profile"
-                    android:layout_width="match_parent"
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:contentDescription="@string/settings_profile"
+                    android:src="@android:drawable/ic_menu_myplaces"
+                    app:tint="@color/primary" />
+
+                <TextView
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:text="@string/settings_profile"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@android:drawable/ic_menu_myplaces"
-                        app:tint="@color/primary" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_weight="1"
-                        android:text="@string/settings_profile"
-                        android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@android:drawable/ic_media_play"
-                        app:tint="@color/outline" />
-                </LinearLayout>
-
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:contentDescription="@null"
+                    android:src="@android:drawable/ic_media_play"
+                    app:tint="@color/outline" />
             </LinearLayout>
+
         </com.google.android.material.card.MaterialCardView>
 
         <TextView
@@ -107,6 +103,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
+                        android:contentDescription="@string/settings_currency"
                         android:src="@android:drawable/ic_menu_send"
                         app:tint="@color/primary" />
 
@@ -139,7 +136,7 @@
                     android:layout_marginHorizontal="16dp"
                     android:background="@color/outline" />
 
-                <LinearLayout
+                <TextView
                     android:id="@+id/btn_limit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -147,23 +144,12 @@
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@android:drawable/ic_lock_idle_alarm"
-                        app:tint="@color/primary" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_weight="1"
-                        android:text="@string/settings_daily_limit"
-                        android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
-                </LinearLayout>
+                    android:padding="16dp"
+                    app:drawableStartCompat="@android:drawable/ic_lock_idle_alarm"
+                    android:drawablePadding="16dp"
+                    app:drawableTint="@color/primary"
+                    android:text="@string/settings_daily_limit"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
 
                 <TextView
                     android:id="@+id/tv_limit_value"
@@ -195,6 +181,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
+                        android:contentDescription="@string/settings_emergency_goal"
                         android:src="@android:drawable/ic_menu_save"
                         app:tint="@color/primary" />
 
@@ -241,6 +228,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
+                        android:contentDescription="@string/settings_summary_time_label"
                         android:src="@android:drawable/ic_menu_recent_history"
                         app:tint="@color/primary" />
 
@@ -254,14 +242,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Thời gian tổng kết"
+                            android:text="@string/settings_summary_time_label"
                             android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
 
                         <TextView
                             android:id="@+id/tv_notification_status"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="00:00"
+                            android:text="@string/settings_summary_time_default"
                             android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
                             android:textColor="@color/text_secondary" />
                     </LinearLayout>
@@ -283,6 +271,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
+                        android:contentDescription="@string/settings_dark_mode"
                         android:src="@android:drawable/ic_menu_day"
                         app:tint="@color/primary" />
 
@@ -312,7 +301,7 @@
             app:strokeWidth="1dp"
             app:cardBackgroundColor="#FFF5F5">
 
-            <LinearLayout
+            <TextView
                 android:id="@+id/btn_reset"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -320,24 +309,15 @@
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
                 android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
+                android:padding="16dp"
+                app:drawableStartCompat="@android:drawable/ic_menu_delete"
+                android:drawablePadding="16dp"
+                app:drawableTint="@color/error"
+                android:text="@string/settings_data_reset"
+                android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                android:textColor="@color/error"
+                android:textStyle="bold" />
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@android:drawable/ic_menu_delete"
-                    app:tint="@color/error" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:text="@string/settings_data_reset"
-                    android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
-                    android:textColor="@color/error"
-                    android:textStyle="bold" />
-            </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
         <TextView

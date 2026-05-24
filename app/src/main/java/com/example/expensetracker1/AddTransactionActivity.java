@@ -12,6 +12,11 @@ import com.example.expensetracker1.data.Transaction;
 import com.example.expensetracker1.databinding.ActivityAddTransactionBinding;
 import com.example.expensetracker1.util.AppSettings;
 import com.example.expensetracker1.viewmodel.TransactionViewModel;
+import com.google.android.material.datepicker.MaterialDatePicker;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class AddTransactionActivity extends AppCompatActivity {
 
@@ -24,6 +29,7 @@ public class AddTransactionActivity extends AppCompatActivity {
     private ActivityAddTransactionBinding binding;
     private TransactionViewModel viewModel;
     private int transactionId = 0;
+    private long transactionDate = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,12 +44,15 @@ public class AddTransactionActivity extends AppCompatActivity {
 
         setupToolbar();
         setupCategoryDropdown();
+        setupDatePicker();
         
         if (transactionId != 0) {
             loadTransactionData();
             binding.btnSave.setText(R.string.btn_update);
             binding.btnDelete.setVisibility(android.view.View.VISIBLE);
         } else {
+            transactionDate = System.currentTimeMillis();
+            updateDateDisplay();
             applyPresetFromIntent();
         }
 
@@ -51,9 +60,35 @@ public class AddTransactionActivity extends AppCompatActivity {
         binding.btnDelete.setOnClickListener(v -> deleteTransaction());
     }
 
+    private void setupDatePicker() {
+        binding.etDate.setFocusable(false);
+        binding.etDate.setLongClickable(false);
+        binding.etDate.setOnClickListener(v -> {
+            MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
+                    .setTitleText(R.string.label_date)
+                    .setSelection(transactionDate != 0 ? transactionDate : MaterialDatePicker.todayInUtcMilliseconds())
+                    .build();
+
+            datePicker.addOnPositiveButtonClickListener(selection -> {
+                transactionDate = selection;
+                updateDateDisplay();
+            });
+
+            datePicker.show(getSupportFragmentManager(), "DATE_PICKER");
+        });
+    }
+
+    private void updateDateDisplay() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        binding.etDate.setText(sdf.format(new Date(transactionDate)));
+    }
+
     private void loadTransactionData() {
         viewModel.getTransactionById(transactionId).observe(this, transaction -> {
             if (transaction != null) {
+                transactionDate = transaction.getDate();
+                updateDateDisplay();
                 binding.etTitle.setText(transaction.getTitle());
                 
                 double rate = AppSettings.getExchangeRate(this);
@@ -142,8 +177,8 @@ public class AddTransactionActivity extends AppCompatActivity {
         String title = String.valueOf(binding.etTitle.getText()).trim();
         String type = binding.toggleGroup.getCheckedButtonId() == R.id.btn_expense ? "EXPENSE" : "INCOME";
 
-        if (amountStr.isEmpty() || title.isEmpty()) {
-            Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+        if (amountStr.isEmpty()) {
+            Toast.makeText(this, "Số tiền không hợp lệ", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -153,60 +188,49 @@ public class AddTransactionActivity extends AppCompatActivity {
             double amountVnd = inputAmount / rate;
 
             String category = String.valueOf(binding.actvCategory.getText()).trim();
-
-            if ("EXPENSE".equals(type)) {
-                double hanMucNgay = AppSettings.getDailyLimit(this);
-
-                java.util.Calendar cal = java.util.Calendar.getInstance();
-                cal.set(java.util.Calendar.HOUR_OF_DAY, 0); cal.set(java.util.Calendar.MINUTE, 0);
-                cal.set(java.util.Calendar.SECOND, 0); cal.set(java.util.Calendar.MILLISECOND, 0);
-                long startOfDay = cal.getTimeInMillis();
-
-                cal.set(java.util.Calendar.HOUR_OF_DAY, 23); cal.set(java.util.Calendar.MINUTE, 59);
-                cal.set(java.util.Calendar.SECOND, 59); cal.set(java.util.Calendar.MILLISECOND, 999);
-                long endOfDay = cal.getTimeInMillis();
-
-                androidx.lifecycle.LiveData<Double> liveData = viewModel.getTodayExpenses(startOfDay, endOfDay);
-
-                liveData.observe(this, new androidx.lifecycle.Observer<Double>() {
-                    @Override
-                    public void onChanged(Double totalToday) {
-                        liveData.removeObserver(this);
-
-                        double tongDaTieuCu = (totalToday != null) ? totalToday : 0.0;
-                        double soTienConLai = hanMucNgay - (tongDaTieuCu + amountVnd);
-
-                        // ==========================================
-                        // KÍCH HOẠT THÔNG BÁO CHI TIÊU & CẢNH BÁO ÂM
-                        // (Git đã xóa mất đoạn này của bạn)
-                        // ==========================================
-                        NotificationHelper.sendExpenseNotification(AddTransactionActivity.this, amountVnd, title);
-                        NotificationHelper.checkAndSendBudgetNotification(AddTransactionActivity.this, soTienConLai);
-
-                        Transaction transaction = new Transaction(0, title, amountVnd, category, System.currentTimeMillis(), "", type);
-                        viewModel.insert(transaction);
-
-                        Toast.makeText(AddTransactionActivity.this, "Đã lưu khoản chi: " + title, Toast.LENGTH_SHORT).show();
-                        finish();
-                    }
-                });
-
-            } else {
-                Transaction transaction = new Transaction(0, title, amountVnd, category, System.currentTimeMillis(), "", type);
-                viewModel.insert(transaction);
-
-                // ==========================================
-                // KÍCH HOẠT THÔNG BÁO THU NHẬP
-                // (Git cũng xóa mất đoạn này của bạn)
-                // ==========================================
-                NotificationHelper.sendIncomeNotification(this, amountVnd, title);
-
-                Toast.makeText(this, "Đã lưu khoản thu: " + title, Toast.LENGTH_SHORT).show();
-                finish();
+            if (title.isEmpty()) {
+                title = category.isEmpty() ? "Khoản chi" : category;
             }
 
+            long dateToUse = (transactionDate != 0) ? transactionDate : System.currentTimeMillis();
+            
+            if (transactionId != 0) {
+                Transaction transaction = new Transaction(transactionId, title, amountVnd, category, dateToUse, "", type);
+                viewModel.update(transaction);
+                Toast.makeText(this, "Đã cập nhật: " + title, Toast.LENGTH_SHORT).show();
+            } else {
+                Transaction transaction = new Transaction(0, title, amountVnd, category, dateToUse, "", type);
+                viewModel.insert(transaction);
+                Toast.makeText(this, "Đã lưu: " + title, Toast.LENGTH_SHORT).show();
+                
+                // Keep teammate's notification logic but simplified
+                if ("EXPENSE".equals(type)) {
+                    double hanMucNgay = AppSettings.getDailyLimit(this);
+                    viewModel.getTodayExpensesValue(getStartOfDayMillis(), getEndOfDayMillis(), today -> {
+                        double remaining = hanMucNgay - (today + amountVnd);
+                        NotificationHelper.checkAndSendBudgetNotification(this, remaining);
+                    });
+                } else {
+                    NotificationHelper.sendIncomeNotification(this, amountVnd, title);
+                }
+            }
+            finish();
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Số tiền không hợp lệ", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private long getStartOfDayMillis() {
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        cal.set(java.util.Calendar.HOUR_OF_DAY, 0); cal.set(java.util.Calendar.MINUTE, 0);
+        cal.set(java.util.Calendar.SECOND, 0); cal.set(java.util.Calendar.MILLISECOND, 0);
+        return cal.getTimeInMillis();
+    }
+
+    private long getEndOfDayMillis() {
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        cal.set(java.util.Calendar.HOUR_OF_DAY, 23); cal.set(java.util.Calendar.MINUTE, 59);
+        cal.set(java.util.Calendar.SECOND, 59); cal.set(java.util.Calendar.MILLISECOND, 999);
+        return cal.getTimeInMillis();
     }
 }
