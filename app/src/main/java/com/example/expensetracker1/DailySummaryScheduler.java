@@ -4,6 +4,7 @@ import android.content.Context;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
+import com.example.expensetracker1.util.AppSettings;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
@@ -12,8 +13,9 @@ public class DailySummaryScheduler {
     private static final String WORK_NAME = "DailySummaryWork";
 
     public static void scheduleDailySummary(Context context) {
-        int targetHour = 0;
-        int targetMinute = 0;
+        // Đã đổi thành đọc giờ động từ Settings thay vì số 0 cứng
+        int targetHour = AppSettings.getSummaryHour(context);
+        int targetMinute = AppSettings.getSummaryMinute(context);
 
         Calendar currentDate = Calendar.getInstance();
         Calendar dueDate = Calendar.getInstance();

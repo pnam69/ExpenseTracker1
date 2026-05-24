@@ -2,30 +2,23 @@ package com.example.expensetracker1;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
-import android.Manifest;
-import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-// ĐÃ THÊM: 2 thư viện để kiểm tra quyền thông báo
-import androidx.core.content.ContextCompat;
-import android.content.pm.PackageManager;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.timepicker.MaterialTimePicker;
+import com.google.android.material.timepicker.TimeFormat;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.activity.result.ActivityResultLauncher;
 
 import com.example.expensetracker1.databinding.FragmentSettingsBinding;
 import com.example.expensetracker1.util.AppSettings;
@@ -37,8 +30,6 @@ public class SettingsFragment extends Fragment {
 
     private FragmentSettingsBinding binding;
     private TransactionViewModel viewModel;
-    private ActivityResultLauncher<String> notificationPermissionLauncher;
-    private boolean permissionDeniedOnce = false;
 
     @Nullable
     @Override
@@ -52,22 +43,9 @@ public class SettingsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         viewModel = new ViewModelProvider(this).get(TransactionViewModel.class);
-        notificationPermissionLauncher = registerForActivityResult(
-                new ActivityResultContracts.RequestPermission(),
-                isGranted -> {
-                    updateNotificationStatus();
-                    if (isGranted != null && isGranted) {
-                        Toast.makeText(requireContext(), R.string.msg_notifications_enabled, Toast.LENGTH_SHORT).show();
-                        permissionDeniedOnce = false;
-                    } else {
-                        permissionDeniedOnce = true;
-                        Toast.makeText(requireContext(), R.string.msg_notifications_denied, Toast.LENGTH_SHORT).show();
-                    }
-                }
-        );
 
         renderCurrentSettings();
-        setupNotificationControls();
+        setupSummaryTimeControls();
 
         binding.btnProfile.setOnClickListener(v -> {
             Intent intent = new Intent(requireContext(), ProfileActivity.class);
@@ -75,11 +53,8 @@ public class SettingsFragment extends Fragment {
         });
 
         binding.btnCurrency.setOnClickListener(v -> showCurrencyDialog());
-
         binding.btnLimit.setOnClickListener(v -> showDailyLimitDialog());
-
         binding.btnEmergencyGoal.setOnClickListener(v -> showEmergencyGoalDialog());
-
         binding.btnReset.setOnClickListener(v -> showResetConfirmation());
 
         binding.switchDarkMode.setChecked(AppSettings.isDarkModeEnabled(requireContext()));
@@ -92,68 +67,52 @@ public class SettingsFragment extends Fragment {
         });
     }
 
-    private void setupNotificationControls() {
-        updateNotificationStatus();
+    // === TÍNH NĂNG MỚI: BẬT ĐỒNG HỒ CHỌN GIỜ ===
+    private void setupSummaryTimeControls() {
+        updateSummaryTimeDisplay();
+
         binding.btnNotifications.setOnClickListener(v -> {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                Toast.makeText(requireContext(), R.string.msg_notifications_not_required, Toast.LENGTH_SHORT).show();
-                return;
-            }
+            int currentHour = AppSettings.getSummaryHour(requireContext());
+            int currentMinute = AppSettings.getSummaryMinute(requireContext());
 
-            // ĐÃ SỬA LỖI 1: Thay NotificationHelper bằng hàm kiểm tra chuẩn của Android
-            boolean isGranted = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
-            if (isGranted) {
-                Toast.makeText(requireContext(), R.string.msg_notifications_enabled, Toast.LENGTH_SHORT).show();
-                return;
-            }
+            // Tạo giao diện đồng hồ chọn giờ
+            MaterialTimePicker timePicker = new MaterialTimePicker.Builder()
+                    .setTimeFormat(TimeFormat.CLOCK_24H) // Đồng hồ 24h
+                    .setHour(currentHour)
+                    .setMinute(currentMinute)
+                    .setTitleText("Chọn giờ tổng kết hàng ngày")
+                    .build();
 
-            if (permissionDeniedOnce) {
-                showNotificationDeniedDialog();
-                return;
-            }
+            // Lắng nghe khi người dùng bấm "OK"
+            timePicker.addOnPositiveButtonClickListener(dialog -> {
+                int selectedHour = timePicker.getHour();
+                int selectedMinute = timePicker.getMinute();
 
-            if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
-                new MaterialAlertDialogBuilder(requireContext())
-                        .setTitle(R.string.dialog_notifications_title)
-                        .setMessage(R.string.dialog_notifications_message)
-                        .setPositiveButton(R.string.allow, (dialog, which) -> notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS))
-                        .setNegativeButton(R.string.cancel, null)
-                        .show();
-            } else {
-                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
-            }
+                // 1. Lưu giờ vào cài đặt
+                AppSettings.setSummaryTime(requireContext(), selectedHour, selectedMinute);
+
+                // 2. Cập nhật chữ trên màn hình (vd: 22:30)
+                updateSummaryTimeDisplay();
+
+                // 3. Reset lại bộ đếm giờ ngầm ngay lập tức theo giờ mới
+                DailySummaryScheduler.scheduleDailySummary(requireContext());
+
+                String formattedTime = String.format(Locale.getDefault(), "%02d:%02d", selectedHour, selectedMinute);
+                Toast.makeText(requireContext(), "Đã đặt giờ tổng kết lúc: " + formattedTime, Toast.LENGTH_SHORT).show();
+            });
+
+            // Hiển thị đồng hồ lên màn hình
+            timePicker.show(getParentFragmentManager(), "TIME_PICKER");
         });
     }
 
-    private void updateNotificationStatus() {
+    private void updateSummaryTimeDisplay() {
         if (binding == null) return;
+        int hour = AppSettings.getSummaryHour(requireContext());
+        int minute = AppSettings.getSummaryMinute(requireContext());
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            binding.tvNotificationStatus.setText(R.string.notification_status_not_required);
-            return;
-        }
-
-        // ĐÃ SỬA LỖI 1: Tương tự như trên
-        boolean granted = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
-        binding.tvNotificationStatus.setText(granted ? R.string.notification_status_enabled : R.string.notification_status_disabled);
-    }
-
-    private void showNotificationDeniedDialog() {
-        if (!isAdded()) return;
-
-        new MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.dialog_notifications_denied_title)
-                .setMessage(R.string.dialog_notifications_denied_message)
-                .setPositiveButton(R.string.open_settings, (dialog, which) -> openAppNotificationSettings())
-                .setNegativeButton(R.string.cancel, null)
-                .show();
-    }
-
-    private void openAppNotificationSettings() {
-        Intent intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
-        intent.putExtra(Settings.EXTRA_APP_PACKAGE, requireContext().getPackageName());
-        intent.setData(Uri.fromParts("package", requireContext().getPackageName(), null));
-        startActivity(intent);
+        // Hiển thị giờ đẹp dạng 00:00
+        binding.tvNotificationStatus.setText(String.format(Locale.getDefault(), "%02d:%02d", hour, minute));
     }
 
     private void renderCurrentSettings() {
@@ -273,7 +232,6 @@ public class SettingsFragment extends Fragment {
                 .setTitle(R.string.dialog_reset_title)
                 .setMessage(R.string.dialog_reset_message)
                 .setPositiveButton(R.string.dialog_reset_positive, (dialog, which) -> {
-                    // ĐÃ SỬA LỖI 2: Tách riêng hàm gọi xóa và các lệnh cập nhật giao diện
                     viewModel.deleteAllTransactions();
                     Toast.makeText(requireContext(), R.string.msg_data_cleared, Toast.LENGTH_SHORT).show();
                     requireActivity().recreate();

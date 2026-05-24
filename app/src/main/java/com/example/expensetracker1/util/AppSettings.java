@@ -126,4 +126,22 @@ public final class AppSettings {
         String formatted = String.format(Locale.US, "%,.2f", converted);
         return symbol + formatted;
     }
+    // === LƯU TRỮ GIỜ TỔNG KẾT ===
+    private static final String KEY_SUMMARY_HOUR = "summary_hour";
+    private static final String KEY_SUMMARY_MINUTE = "summary_minute";
+
+    public static int getSummaryHour(Context context) {
+        return prefs(context).getInt(KEY_SUMMARY_HOUR, 0); // Mặc định 0 giờ
+    }
+
+    public static int getSummaryMinute(Context context) {
+        return prefs(context).getInt(KEY_SUMMARY_MINUTE, 0); // Mặc định 0 phút
+    }
+
+    public static void setSummaryTime(Context context, int hour, int minute) {
+        prefs(context).edit()
+                .putInt(KEY_SUMMARY_HOUR, hour)
+                .putInt(KEY_SUMMARY_MINUTE, minute)
+                .apply();
+    }
 }
