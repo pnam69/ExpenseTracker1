@@ -128,7 +128,7 @@ public class DashboardFragment extends Fragment {
 
         new MaterialAlertDialogBuilder(context)
                 .setTitle(R.string.settings_emergency_goal)
-                .setMessage("Thiết lập mục tiêu quỹ dự phòng của bạn (" + AppSettings.getCurrencySymbol(context) + ")")
+                .setMessage(getString(R.string.dialog_emergency_goal_message, AppSettings.getCurrencySymbol(context)))
                 .setView(input)
                 .setPositiveButton(R.string.save, (dialog, which) -> {
                     try {
@@ -136,7 +136,7 @@ public class DashboardFragment extends Fragment {
                         if (text.isEmpty()) return;
                         double inputGoal = Double.parseDouble(text);
                         if (inputGoal <= 0) {
-                            android.widget.Toast.makeText(context, "Mục tiêu phải lớn hơn 0", android.widget.Toast.LENGTH_SHORT).show();
+                            android.widget.Toast.makeText(context, R.string.msg_goal_positive, android.widget.Toast.LENGTH_SHORT).show();
                             return;
                         }
 
@@ -144,7 +144,7 @@ public class DashboardFragment extends Fragment {
                         AppSettings.setEmergencyGoal(context, goalVnd);
                         observeData(); // Refresh UI
                     } catch (NumberFormatException e) {
-                        android.widget.Toast.makeText(context, "Giá trị không hợp lệ", android.widget.Toast.LENGTH_SHORT).show();
+                        android.widget.Toast.makeText(context, R.string.msg_goal_invalid, android.widget.Toast.LENGTH_SHORT).show();
                     }
                 })
                 .setNegativeButton(R.string.cancel, null)
@@ -255,10 +255,10 @@ public class DashboardFragment extends Fragment {
     }
 
     private void setupQuickAdd() {
-        binding.chipMeal.setOnClickListener(v -> quickAdd("Ăn uống", 35000.0, "Ăn uống"));
-        binding.chipMarket.setOnClickListener(v -> quickAdd("Đi chợ", 150000.0, "Sinh hoạt"));
-        binding.chipFuel.setOnClickListener(v -> quickAdd("Đổ xăng", 50000.0, "Đi lại"));
-        binding.chipBill.setOnClickListener(v -> quickAdd("Hoá đơn", 200000.0, "Hoá đơn"));
+        binding.chipMeal.setOnClickListener(v -> quickAdd(getString(R.string.chip_meal), 35000.0, getString(R.string.quick_add_category_meal)));
+        binding.chipMarket.setOnClickListener(v -> quickAdd(getString(R.string.chip_market), 150000.0, getString(R.string.quick_add_category_market)));
+        binding.chipFuel.setOnClickListener(v -> quickAdd(getString(R.string.chip_fuel), 50000.0, getString(R.string.quick_add_category_fuel)));
+        binding.chipBill.setOnClickListener(v -> quickAdd(getString(R.string.chip_bill), 200000.0, getString(R.string.quick_add_category_bill)));
     }
 
     private void quickAdd(String title, double amount, String category) {
@@ -289,10 +289,10 @@ public class DashboardFragment extends Fragment {
         android.content.Context context = getContext();
         if (context == null) return;
         new MaterialAlertDialogBuilder(context)
-                .setTitle("Xoá giao dịch")
-                .setMessage("Bạn có chắc chắn muốn xoá '" + transaction.getTitle() + "'?")
-                .setPositiveButton("Xoá", (dialog, which) -> viewModel.delete(transaction))
-                .setNegativeButton("Huỷ", null)
+                .setTitle(R.string.dialog_delete_title)
+                .setMessage(getString(R.string.dialog_delete_item_message, transaction.getTitle()))
+                .setPositiveButton(R.string.delete, (dialog, which) -> viewModel.delete(transaction))
+                .setNegativeButton(R.string.cancel, null)
                 .show();
     }
 

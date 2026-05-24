@@ -39,6 +39,12 @@ public interface TransactionDao {
     @Query("SELECT SUM(amount) FROM transactions WHERE type = 'EXPENSE' AND date >= :startOfDay AND date < :endOfDay")
     LiveData<Double> getTodayExpenses(long startOfDay, long endOfDay);
 
+    @Query("SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE type = 'EXPENSE' AND date >= :startOfDay AND date < :endOfDay")
+    Double getTodayExpensesValue(long startOfDay, long endOfDay);
+
     @Query("SELECT SUM(amount) FROM transactions WHERE type = 'EXPENSE' AND date >= :startOfMonth")
     LiveData<Double> getMonthExpenses(long startOfMonth);
+
+    @Query("SELECT * FROM transactions WHERE date >= :start AND date < :end ORDER BY date DESC")
+    LiveData<List<Transaction>> getTransactionsByDateRange(long start, long end);
 }

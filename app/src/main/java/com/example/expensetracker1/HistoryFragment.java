@@ -65,12 +65,15 @@ public class HistoryFragment extends Fragment {
     }
 
     private void showSortDialog() {
-        String[] options = {"Mới nhất", "Cũ nhất", "Số tiền (Cao - Thấp)", "Số tiền (Thấp - Cao)"};
+        String[] options = {
+                getString(R.string.sort_newest),
+                getString(R.string.sort_oldest),
+                getString(R.string.sort_amount_desc),
+                getString(R.string.sort_amount_asc)
+        };
         new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Sắp xếp giao dịch")
-                .setItems(options, (dialog, which) -> {
-                    sortTransactions(which);
-                })
+                .setTitle(R.string.dialog_sort_title)
+                .setItems(options, (dialog, which) -> sortTransactions(which))
                 .show();
     }
 

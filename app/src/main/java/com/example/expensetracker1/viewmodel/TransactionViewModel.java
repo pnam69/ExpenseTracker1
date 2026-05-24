@@ -18,6 +18,10 @@ import java.util.concurrent.Executors;
 
 public class TransactionViewModel extends AndroidViewModel {
 
+    public interface DoubleResultCallback {
+        void onResult(double value);
+    }
+
     private final TransactionDao transactionDao;
     private final LiveData<List<Transaction>> allTransactions;
     private final ExecutorService executorService;
@@ -51,8 +55,17 @@ public class TransactionViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<Transaction>> getTransactionsByDateRange(long start, long end) {
-        // Method to facilitate better time-based filtering in ViewModel if needed
-        return allTransactions; // Simple placeholder or implement DAO method if more scale is needed
+        return transactionDao.getTransactionsByDateRange(start, end);
+    }
+
+    public void getTodayExpensesValue(long startOfDay, long endOfDay, DoubleResultCallback callback) {
+        executorService.execute(() -> {
+            Double value = transactionDao.getTodayExpensesValue(startOfDay, endOfDay);
+            double safeValue = value != null ? value : 0.0;
+            if (callback != null) {
+                new Handler(Looper.getMainLooper()).post(() -> callback.onResult(safeValue));
+            }
+        });
     }
 
     public void insert(Transaction transaction) {

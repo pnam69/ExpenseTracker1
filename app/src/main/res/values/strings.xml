@@ -22,6 +22,8 @@
 
     <!-- Settings -->
     <string name="settings_title">Cài đặt</string>
+    <string name="settings_section_account">Tài khoản</string>
+    <string name="settings_section_customize">Tuỳ chỉnh</string>
     <string name="settings_profile">Hồ sơ cá nhân</string>
     <string name="settings_currency">Đơn vị tiền tệ</string>
     <string name="settings_daily_limit">Hạn mức chi tiêu ngày</string>
@@ -30,6 +32,24 @@
     <string name="settings_dark_mode">Chế độ tối</string>
     <string name="settings_data_reset">Xoá toàn bộ dữ liệu</string>
     <string name="settings_about">Về ứng dụng</string>
+    <string name="settings_default_currency_label">Việt Nam Đồng (VND)</string>
+    <string name="settings_default_daily_limit_display">200.000đ/ngày</string>
+    <string name="settings_default_emergency_goal_display">15.000.000đ</string>
+    <string name="settings_app_version">FinGuard v1.0.0</string>
+    <string name="notification_status_enabled">Đang bật</string>
+    <string name="notification_status_disabled">Chưa bật</string>
+    <string name="notification_status_not_required">Không cần cấp quyền trên phiên bản này</string>
+    <string name="msg_notifications_enabled">Đã bật thông báo</string>
+    <string name="msg_notifications_denied">Bạn đã từ chối quyền thông báo</string>
+    <string name="msg_notifications_not_required">Phiên bản này không cần xin quyền thông báo</string>
+    <string name="msg_dark_mode_enabled">Đã bật Chế độ tối</string>
+    <string name="msg_dark_mode_disabled">Đã tắt Chế độ tối</string>
+    <string name="dialog_notifications_title">Bật thông báo</string>
+    <string name="dialog_notifications_message">Ứng dụng cần quyền thông báo để nhắc nhở khi vượt hạn mức hoặc có khoản thu mới.</string>
+    <string name="dialog_notifications_denied_title">Quyền thông báo đang bị tắt</string>
+    <string name="dialog_notifications_denied_message">Bạn đã từ chối quyền thông báo. Hãy mở cài đặt ứng dụng để bật lại nếu muốn nhận cảnh báo.</string>
+    <string name="open_settings">Mở cài đặt</string>
+    <string name="allow">Cho phép</string>
     <string name="profile_title">Hồ sơ cá nhân</string>
     <string name="profile_name_hint">Họ và tên</string>
     <string name="profile_email_hint">Email</string>
@@ -44,6 +64,10 @@
     <string name="chip_market">🛒 Đi chợ</string>
     <string name="chip_fuel">⛽ Đổ xăng</string>
     <string name="chip_bill">📑 Hoá đơn</string>
+    <string name="quick_add_category_meal">Ăn uống</string>
+    <string name="quick_add_category_market">Sinh hoạt</string>
+    <string name="quick_add_category_fuel">Đi lại</string>
+    <string name="quick_add_category_bill">Hoá đơn</string>
     <string name="goal_progress">8.5tr / 15tr</string>
     <string name="budget_progress">42%%</string>
     <string name="savings_message">Bạn đang duy trì thói quen tiết kiệm rất tốt</string>
@@ -53,6 +77,7 @@
     <string name="search_hint">Tìm kiếm giao dịch&#8230;</string>
     <string name="filter_all">Tất cả</string>
     <string name="acc_button_settings">Settings</string>
+    <string name="acc_button_sort_history">Sắp xếp giao dịch</string>
     <string name="filter_expense">Chi tiêu</string>
     <string name="filter_income">Thu nhập</string>
     <string name="filter_this_month">Tháng này</string>
@@ -81,12 +106,16 @@
     <string name="dialog_currency_title">Chọn đơn vị tiền tệ</string>
     <string name="dialog_limit_title">Thiết lập hạn mức chi tiêu</string>
     <string name="dialog_limit_message">Hạn mức này sẽ được dùng để tính số tiền còn lại trong ngày (%s).</string>
+    <string name="dialog_emergency_goal_message">Thiết lập mục tiêu quỹ dự phòng của bạn (%s)</string>
     <string name="dialog_reset_title">Xác nhận xoá</string>
     <string name="dialog_reset_message">Bạn có chắc chắn muốn xoá toàn bộ dữ liệu giao dịch không? Hành động này không thể hoàn tác.</string>
     <string name="dialog_reset_positive">Xoá tất cả</string>
     <string name="msg_data_cleared">Dữ liệu đã được xoá</string>
     <string name="cancel">Huỷ</string>
     <string name="save">Lưu</string>
+    <string name="msg_goal_positive">Mục tiêu phải lớn hơn 0</string>
+    <string name="msg_goal_updated">Đã cập nhật mục tiêu</string>
+    <string name="msg_goal_invalid">Giá trị không hợp lệ</string>
 
     <!-- Stats Filters -->
     <string name="stats_filter_all">Tất cả</string>
@@ -104,10 +133,38 @@
     <string name="sort_amount_asc">Số tiền (Thấp - Cao)</string>
     <string name="dialog_delete_title">Xoá giao dịch</string>
     <string name="dialog_delete_msg">Bạn có chắc chắn muốn xoá giao dịch này?</string>
+    <string name="dialog_delete_item_message">Bạn có chắc chắn muốn xoá &quot;%1$s&quot;?</string>
     <string name="delete">Xoá</string>
     <string name="msg_deleted">Đã xoá giao dịch</string>
     <string name="dialog_delete_confirm">Bạn có chắc muốn xoá giao dịch này?</string>
     <string name="btn_delete_transaction">Xoá giao dịch này</string>
+    <string name="msg_transaction_updated">Đã cập nhật: %s</string>
     <string name="category_dining">Ăn uống</string>
+    <string name="category_living">Sinh hoạt</string>
+    <string name="category_transport">Đi lại</string>
     <string name="dialog_date_range_title">Chọn khoảng thời gian</string>
+    <string name="stats_custom_filter">Tuỳ chọn</string>
+    <string name="stats_insight_loading">Đang phân tích dữ liệu chi tiêu của bạn...</string>
+    <string name="stats_chart_income">Thu nhập</string>
+    <string name="stats_chart_expense">Chi tiêu</string>
+    <string name="stats_default_income_display">15.500.000đ</string>
+    <string name="stats_default_expense_display">6.250.000đ</string>
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_history">History</string>
+    <string name="nav_statistics">Statistics</string>
+    <string name="nav_settings">Settings</string>
+
+    <string-array name="transaction_categories">
+        <item>@string/category_dining</item>
+        <item>@string/category_transport</item>
+        <item>Mua sắm</item>
+        <item>Nhà cửa</item>
+        <item>Hoá đơn</item>
+        <item>Giải trí</item>
+        <item>Sức khỏe</item>
+        <item>Giáo dục</item>
+        <item>Lương</item>
+        <item>Thưởng</item>
+        <item>Khác</item>
+    </string-array>
 </resources>

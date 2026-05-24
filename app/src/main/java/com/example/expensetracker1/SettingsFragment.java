@@ -2,21 +2,26 @@ package com.example.expensetracker1;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
+import android.Manifest;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.activity.result.ActivityResultLauncher;
 
 import com.example.expensetracker1.databinding.FragmentSettingsBinding;
 import com.example.expensetracker1.util.AppSettings;
@@ -28,6 +33,8 @@ public class SettingsFragment extends Fragment {
 
     private FragmentSettingsBinding binding;
     private TransactionViewModel viewModel;
+    private ActivityResultLauncher<String> notificationPermissionLauncher;
+    private boolean permissionDeniedOnce = false;
 
     @Nullable
     @Override
@@ -41,8 +48,22 @@ public class SettingsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         viewModel = new ViewModelProvider(this).get(TransactionViewModel.class);
+        notificationPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    updateNotificationStatus();
+                    if (isGranted != null && isGranted) {
+                        Toast.makeText(requireContext(), R.string.msg_notifications_enabled, Toast.LENGTH_SHORT).show();
+                        permissionDeniedOnce = false;
+                    } else {
+                        permissionDeniedOnce = true;
+                        Toast.makeText(requireContext(), R.string.msg_notifications_denied, Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
 
         renderCurrentSettings();
+        setupNotificationControls();
 
         binding.btnProfile.setOnClickListener(v -> {
             Intent intent = new Intent(requireContext(), ProfileActivity.class);
@@ -63,8 +84,69 @@ public class SettingsFragment extends Fragment {
             AppCompatDelegate.setDefaultNightMode(
                     isChecked ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO
             );
-            Toast.makeText(requireContext(), isChecked ? "Đã bật Chế độ tối" : "Đã tắt Chế độ tối", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), isChecked ? R.string.msg_dark_mode_enabled : R.string.msg_dark_mode_disabled, Toast.LENGTH_SHORT).show();
         });
+    }
+
+    private void setupNotificationControls() {
+        updateNotificationStatus();
+        binding.btnNotifications.setOnClickListener(v -> {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                Toast.makeText(requireContext(), R.string.msg_notifications_not_required, Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (NotificationHelper.isNotificationPermissionGranted(requireContext())) {
+                Toast.makeText(requireContext(), R.string.msg_notifications_enabled, Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (permissionDeniedOnce) {
+                showNotificationDeniedDialog();
+                return;
+            }
+
+            if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+                new MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(R.string.dialog_notifications_title)
+                        .setMessage(R.string.dialog_notifications_message)
+                        .setPositiveButton(R.string.allow, (dialog, which) -> notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS))
+                        .setNegativeButton(R.string.cancel, null)
+                        .show();
+            } else {
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            }
+        });
+    }
+
+    private void updateNotificationStatus() {
+        if (binding == null) return;
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            binding.tvNotificationStatus.setText(R.string.notification_status_not_required);
+            return;
+        }
+
+        boolean granted = NotificationHelper.isNotificationPermissionGranted(requireContext());
+        binding.tvNotificationStatus.setText(granted ? R.string.notification_status_enabled : R.string.notification_status_disabled);
+    }
+
+    private void showNotificationDeniedDialog() {
+        if (!isAdded()) return;
+
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.dialog_notifications_denied_title)
+                .setMessage(R.string.dialog_notifications_denied_message)
+                .setPositiveButton(R.string.open_settings, (dialog, which) -> openAppNotificationSettings())
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    private void openAppNotificationSettings() {
+        Intent intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+        intent.putExtra(Settings.EXTRA_APP_PACKAGE, requireContext().getPackageName());
+        intent.setData(Uri.fromParts("package", requireContext().getPackageName(), null));
+        startActivity(intent);
     }
 
     private void renderCurrentSettings() {
@@ -154,7 +236,7 @@ public class SettingsFragment extends Fragment {
 
         new MaterialAlertDialogBuilder(context)
                 .setTitle(R.string.settings_emergency_goal)
-                .setMessage("Thiết lập mục tiêu quỹ dự phòng của bạn (" + AppSettings.getCurrencySymbol(context) + ")")
+                .setMessage(getString(R.string.dialog_emergency_goal_message, AppSettings.getCurrencySymbol(context)))
                 .setView(input)
                 .setPositiveButton(R.string.save, (dialog, which) -> {
                     try {
@@ -162,17 +244,17 @@ public class SettingsFragment extends Fragment {
                         if (text.isEmpty()) return;
                         double inputGoal = Double.parseDouble(text);
                         if (inputGoal <= 0) {
-                            Toast.makeText(context, "Mục tiêu phải lớn hơn 0", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, R.string.msg_goal_positive, Toast.LENGTH_SHORT).show();
                             return;
                         }
 
                         double goalVnd = inputGoal / rate;
                         AppSettings.setEmergencyGoal(context, goalVnd);
                         renderCurrentSettings();
-                        Toast.makeText(context, "Đã cập nhật mục tiêu", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, R.string.msg_goal_updated, Toast.LENGTH_SHORT).show();
                         requireActivity().recreate();
                     } catch (NumberFormatException e) {
-                        Toast.makeText(context, "Giá trị không hợp lệ", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, R.string.msg_goal_invalid, Toast.LENGTH_SHORT).show();
                     }
                 })
                 .setNegativeButton(R.string.cancel, null)

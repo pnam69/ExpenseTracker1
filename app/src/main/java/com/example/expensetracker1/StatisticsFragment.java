@@ -104,7 +104,7 @@ public class StatisticsFragment extends Fragment {
         } else if (timeId == R.id.chip_custom) {
             if (customStartMillis != -1 && customEndMillis != -1) {
                 for (Transaction t : allTransactions) {
-                    if (t.getDate() >= customStartMillis && t.getDate() <= customEndMillis) {
+                    if (t.getDate() >= customStartMillis && t.getDate() < customEndMillis) {
                         filtered.add(t);
                     }
                 }
@@ -127,7 +127,8 @@ public class StatisticsFragment extends Fragment {
         picker.addOnPositiveButtonClickListener(selection -> {
             if (selection != null) {
                 customStartMillis = selection.first;
-                customEndMillis = selection.second;
+                // Include the full selected end day with an exclusive upper bound
+                customEndMillis = selection.second + 24L * 60L * 60L * 1000L;
                 applyFilters();
             }
         });
@@ -220,7 +221,9 @@ public class StatisticsFragment extends Fragment {
         int textColor = ContextCompat.getColor(context, R.color.text_primary);
         int holeColor = ContextCompat.getColor(context, R.color.surface);
         
-        binding.pieChart.setCenterText("INCOME".equals(type) ? "Thu nhập" : "Chi tiêu");
+        binding.pieChart.setCenterText("INCOME".equals(type)
+                ? getString(R.string.stats_chart_income)
+                : getString(R.string.stats_chart_expense));
         binding.pieChart.setCenterTextColor(textColor);
         binding.pieChart.setHoleColor(holeColor);
         binding.pieChart.getLegend().setTextColor(textColor);

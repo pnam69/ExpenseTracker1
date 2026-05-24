@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.expensetracker1.databinding.ActivityMainBinding;
 import com.example.expensetracker1.util.AppSettings;
@@ -13,6 +14,7 @@ import com.example.expensetracker1.util.AppSettings;
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
+    private int currentNavItemId = R.id.navigation_dashboard;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,40 +32,25 @@ public class MainActivity extends AppCompatActivity {
         setupNavigation();
 
         if (savedInstanceState == null) {
-            loadFragment(new DashboardFragment());
+            switchToFragment(R.id.navigation_dashboard);
+            binding.bottomNavigation.setSelectedItemId(R.id.navigation_dashboard);
+        } else {
+            int restoredId = binding.bottomNavigation.getSelectedItemId();
+            currentNavItemId = restoredId != 0 ? restoredId : R.id.navigation_dashboard;
+            updateFabVisibility(currentNavItemId);
         }
     }
 
     private void setupNavigation() {
         binding.bottomNavigation.setOnItemSelectedListener(item -> {
-            Fragment fragment;
             int id = item.getItemId();
-            boolean showFab = true;
-            
-            if (id == R.id.navigation_dashboard) {
-                fragment = new DashboardFragment();
-                showFab = true;
-            } else if (id == R.id.navigation_history) {
-                fragment = new HistoryFragment();
-                showFab = true;
-            } else if (id == R.id.navigation_statistics) {
-                fragment = new StatisticsFragment();
-                showFab = false;
-            } else if (id == R.id.navigation_settings) {
-                fragment = new SettingsFragment();
-                showFab = false;
-            } else {
-                fragment = new DashboardFragment();
-                showFab = true;
-            }
-            
-            if (showFab) {
-                binding.fabAddTransaction.show();
-            } else {
-                binding.fabAddTransaction.hide();
+            if (id == currentNavItemId) {
+                return true;
             }
 
-            loadFragment(fragment);
+            currentNavItemId = id;
+            updateFabVisibility(id);
+            switchToFragment(id);
             return true;
         });
 
@@ -73,10 +60,50 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void loadFragment(Fragment fragment) {
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.nav_host_fragment, fragment)
-                .commit();
+    private void updateFabVisibility(int menuItemId) {
+        boolean showFab = menuItemId == R.id.navigation_dashboard || menuItemId == R.id.navigation_history;
+        if (showFab) {
+            binding.fabAddTransaction.show();
+        } else {
+            binding.fabAddTransaction.hide();
+        }
+    }
+
+    private void switchToFragment(int menuItemId) {
+        String tag = getTagForMenu(menuItemId);
+        Fragment target = getSupportFragmentManager().findFragmentByTag(tag);
+        if (target == null) {
+            target = createFragmentForMenu(menuItemId);
+        }
+
+        Fragment current = getSupportFragmentManager().getPrimaryNavigationFragment();
+        FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
+
+        if (current != null && current != target) {
+            tx.hide(current);
+        }
+
+        if (target.isAdded()) {
+            tx.show(target);
+        } else {
+            tx.add(R.id.nav_host_fragment, target, tag);
+        }
+
+        tx.setPrimaryNavigationFragment(target).commit();
+    }
+
+    private Fragment createFragmentForMenu(int menuItemId) {
+        if (menuItemId == R.id.navigation_history) return new HistoryFragment();
+        if (menuItemId == R.id.navigation_statistics) return new StatisticsFragment();
+        if (menuItemId == R.id.navigation_settings) return new SettingsFragment();
+        return new DashboardFragment();
+    }
+
+    private String getTagForMenu(int menuItemId) {
+        if (menuItemId == R.id.navigation_history) return "history";
+        if (menuItemId == R.id.navigation_statistics) return "statistics";
+        if (menuItemId == R.id.navigation_settings) return "settings";
+        return "dashboard";
     }
 
     public void navigateToHistory() {
