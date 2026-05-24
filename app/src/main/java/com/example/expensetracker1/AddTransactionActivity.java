@@ -138,8 +138,8 @@ public class AddTransactionActivity extends AppCompatActivity {
     }
 
     private void saveTransaction() {
-        String amountStr = binding.etAmount.getText().toString().trim();
-        String title = binding.etTitle.getText().toString().trim();
+        String amountStr = String.valueOf(binding.etAmount.getText()).trim();
+        String title = String.valueOf(binding.etTitle.getText()).trim();
         String type = binding.toggleGroup.getCheckedButtonId() == R.id.btn_expense ? "EXPENSE" : "INCOME";
 
         if (amountStr.isEmpty() || title.isEmpty()) {
@@ -150,20 +150,61 @@ public class AddTransactionActivity extends AppCompatActivity {
         try {
             double inputAmount = Double.parseDouble(amountStr);
             double rate = AppSettings.getExchangeRate(this);
-            double amountVnd = inputAmount / rate; 
-            
-            String category = binding.actvCategory.getText().toString().trim();
-            
-            if (transactionId != 0) {
-                Transaction transaction = new Transaction(transactionId, title, amountVnd, category, System.currentTimeMillis(), "", type);
-                viewModel.update(transaction);
-                Toast.makeText(this, "Đã cập nhật: " + title, Toast.LENGTH_SHORT).show();
+            double amountVnd = inputAmount / rate;
+
+            String category = String.valueOf(binding.actvCategory.getText()).trim();
+
+            if ("EXPENSE".equals(type)) {
+                double hanMucNgay = AppSettings.getDailyLimit(this);
+
+                java.util.Calendar cal = java.util.Calendar.getInstance();
+                cal.set(java.util.Calendar.HOUR_OF_DAY, 0); cal.set(java.util.Calendar.MINUTE, 0);
+                cal.set(java.util.Calendar.SECOND, 0); cal.set(java.util.Calendar.MILLISECOND, 0);
+                long startOfDay = cal.getTimeInMillis();
+
+                cal.set(java.util.Calendar.HOUR_OF_DAY, 23); cal.set(java.util.Calendar.MINUTE, 59);
+                cal.set(java.util.Calendar.SECOND, 59); cal.set(java.util.Calendar.MILLISECOND, 999);
+                long endOfDay = cal.getTimeInMillis();
+
+                androidx.lifecycle.LiveData<Double> liveData = viewModel.getTodayExpenses(startOfDay, endOfDay);
+
+                liveData.observe(this, new androidx.lifecycle.Observer<Double>() {
+                    @Override
+                    public void onChanged(Double totalToday) {
+                        liveData.removeObserver(this);
+
+                        double tongDaTieuCu = (totalToday != null) ? totalToday : 0.0;
+                        double soTienConLai = hanMucNgay - (tongDaTieuCu + amountVnd);
+
+                        // ==========================================
+                        // KÍCH HOẠT THÔNG BÁO CHI TIÊU & CẢNH BÁO ÂM
+                        // (Git đã xóa mất đoạn này của bạn)
+                        // ==========================================
+                        NotificationHelper.sendExpenseNotification(AddTransactionActivity.this, amountVnd, title);
+                        NotificationHelper.checkAndSendBudgetNotification(AddTransactionActivity.this, soTienConLai);
+
+                        Transaction transaction = new Transaction(0, title, amountVnd, category, System.currentTimeMillis(), "", type);
+                        viewModel.insert(transaction);
+
+                        Toast.makeText(AddTransactionActivity.this, "Đã lưu khoản chi: " + title, Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                });
+
             } else {
                 Transaction transaction = new Transaction(0, title, amountVnd, category, System.currentTimeMillis(), "", type);
                 viewModel.insert(transaction);
-                Toast.makeText(this, "Đã lưu: " + title, Toast.LENGTH_SHORT).show();
+
+                // ==========================================
+                // KÍCH HOẠT THÔNG BÁO THU NHẬP
+                // (Git cũng xóa mất đoạn này của bạn)
+                // ==========================================
+                NotificationHelper.sendIncomeNotification(this, amountVnd, title);
+
+                Toast.makeText(this, "Đã lưu khoản thu: " + title, Toast.LENGTH_SHORT).show();
+                finish();
             }
-            finish();
+
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Số tiền không hợp lệ", Toast.LENGTH_SHORT).show();
         }
