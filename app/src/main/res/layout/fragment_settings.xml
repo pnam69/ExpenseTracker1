@@ -18,6 +18,7 @@
             android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
             android:textStyle="bold" />
 
+        <!-- Account Section -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -28,18 +29,18 @@
             android:textAllCaps="true" />
 
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btn_profile"
             style="@style/Widget.App.Card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
 
             <LinearLayout
-                android:id="@+id/btn_profile"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="16dp">
@@ -69,6 +70,7 @@
 
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Preferences Section -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -89,6 +91,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+                <!-- Currency -->
                 <LinearLayout
                     android:id="@+id/btn_currency"
                     android:layout_width="match_parent"
@@ -136,6 +139,7 @@
                     android:layout_marginHorizontal="16dp"
                     android:background="@color/outline" />
 
+                <!-- Daily Limit -->
                 <TextView
                     android:id="@+id/btn_limit"
                     android:layout_width="match_parent"
@@ -167,6 +171,7 @@
                     android:layout_marginHorizontal="16dp"
                     android:background="@color/outline" />
 
+                <!-- Emergency Goal -->
                 <LinearLayout
                     android:id="@+id/btn_emergency_goal"
                     android:layout_width="match_parent"
@@ -214,6 +219,7 @@
                     android:layout_marginHorizontal="16dp"
                     android:background="@color/outline" />
 
+                <!-- Notifications -->
                 <LinearLayout
                     android:id="@+id/btn_notifications"
                     android:layout_width="match_parent"
@@ -261,6 +267,7 @@
                     android:layout_marginHorizontal="16dp"
                     android:background="@color/outline" />
 
+                <!-- Dark Mode -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -292,6 +299,7 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Danger Zone -->
         <com.google.android.material.card.MaterialCardView
             style="@style/Widget.App.Card"
             android:layout_width="match_parent"

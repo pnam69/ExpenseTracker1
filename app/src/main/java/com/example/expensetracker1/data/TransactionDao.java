@@ -45,6 +45,15 @@ public interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE date >= :start AND date <= :end")
     LiveData<List<Transaction>> getTransactionsByDateRange(long start, long end);
 
+    @Query("SELECT * FROM transactions WHERE date >= :start AND date <= :end ORDER BY date DESC")
+    List<Transaction> getTransactionsByDateRangeSync(long start, long end);
+
+    @Query("SELECT * FROM transactions WHERE category = :category ORDER BY date DESC")
+    LiveData<List<Transaction>> getTransactionsByCategory(String category);
+
+    @Query("SELECT * FROM transactions WHERE type = :type ORDER BY date DESC")
+    LiveData<List<Transaction>> getTransactionsByType(String type);
+
     // Hàm 2: Lấy tổng chi tiêu trong ngày trả về con số Double trực tiếp (chạy đồng bộ)
     @Query("SELECT SUM(amount) FROM transactions WHERE type = 'EXPENSE' AND date >= :startOfDay AND date <= :endOfDay")
     Double getTodayExpensesValue(long startOfDay, long endOfDay);

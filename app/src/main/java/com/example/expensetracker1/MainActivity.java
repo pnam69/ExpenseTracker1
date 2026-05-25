@@ -29,16 +29,25 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        if (savedInstanceState != null) {
+            currentNavItemId = savedInstanceState.getInt("selected_nav_id", R.id.navigation_dashboard);
+        }
+
         setupNavigation();
 
         if (savedInstanceState == null) {
             switchToFragment(R.id.navigation_dashboard);
             binding.bottomNavigation.setSelectedItemId(R.id.navigation_dashboard);
         } else {
-            int restoredId = binding.bottomNavigation.getSelectedItemId();
-            currentNavItemId = restoredId != 0 ? restoredId : R.id.navigation_dashboard;
+            binding.bottomNavigation.setSelectedItemId(currentNavItemId);
             updateFabVisibility(currentNavItemId);
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(@androidx.annotation.NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("selected_nav_id", currentNavItemId);
     }
 
     private void setupNavigation() {

@@ -12,10 +12,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.timepicker.MaterialTimePicker;
-import com.google.android.material.timepicker.TimeFormat;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -23,6 +19,9 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.expensetracker1.databinding.FragmentSettingsBinding;
 import com.example.expensetracker1.util.AppSettings;
 import com.example.expensetracker1.viewmodel.TransactionViewModel;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.timepicker.MaterialTimePicker;
+import com.google.android.material.timepicker.TimeFormat;
 
 import java.util.Locale;
 
@@ -232,9 +231,12 @@ public class SettingsFragment extends Fragment {
                 .setTitle(R.string.dialog_reset_title)
                 .setMessage(R.string.dialog_reset_message)
                 .setPositiveButton(R.string.dialog_reset_positive, (dialog, which) -> {
-                    viewModel.deleteAllTransactions();
-                    Toast.makeText(requireContext(), R.string.msg_data_cleared, Toast.LENGTH_SHORT).show();
-                    requireActivity().recreate();
+                    viewModel.deleteAllTransactions(() -> {
+                        if (isAdded() && getActivity() != null) {
+                            Toast.makeText(requireContext(), R.string.msg_data_cleared, Toast.LENGTH_SHORT).show();
+                            requireActivity().recreate();
+                        }
+                    });
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show();
