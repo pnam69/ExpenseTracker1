@@ -71,8 +71,11 @@ public class SettingsFragment extends Fragment {
         updateSummaryTimeDisplay();
 
         binding.btnNotifications.setOnClickListener(v -> {
-            int currentHour = AppSettings.getSummaryHour(requireContext());
-            int currentMinute = AppSettings.getSummaryMinute(requireContext());
+            Context context = getContext();
+            if (context == null) return;
+
+            int currentHour = AppSettings.getSummaryHour(context);
+            int currentMinute = AppSettings.getSummaryMinute(context);
 
             // Tạo giao diện đồng hồ chọn giờ
             MaterialTimePicker timePicker = new MaterialTimePicker.Builder()
@@ -84,24 +87,27 @@ public class SettingsFragment extends Fragment {
 
             // Lắng nghe khi người dùng bấm "OK"
             timePicker.addOnPositiveButtonClickListener(dialog -> {
+                Context innerContext = getContext();
+                if (innerContext == null) return;
+
                 int selectedHour = timePicker.getHour();
                 int selectedMinute = timePicker.getMinute();
 
                 // 1. Lưu giờ vào cài đặt
-                AppSettings.setSummaryTime(requireContext(), selectedHour, selectedMinute);
+                AppSettings.setSummaryTime(innerContext, selectedHour, selectedMinute);
 
                 // 2. Cập nhật chữ trên màn hình (vd: 22:30)
                 updateSummaryTimeDisplay();
 
                 // 3. Reset lại bộ đếm giờ ngầm ngay lập tức theo giờ mới
-                DailySummaryScheduler.scheduleDailySummary(requireContext());
+                DailySummaryScheduler.scheduleDailySummary(innerContext);
 
                 String formattedTime = String.format(Locale.getDefault(), "%02d:%02d", selectedHour, selectedMinute);
-                Toast.makeText(requireContext(), "Đã đặt giờ tổng kết lúc: " + formattedTime, Toast.LENGTH_SHORT).show();
+                Toast.makeText(innerContext, "Đã đặt giờ tổng kết lúc: " + formattedTime, Toast.LENGTH_SHORT).show();
             });
 
             // Hiển thị đồng hồ lên màn hình
-            timePicker.show(getParentFragmentManager(), "TIME_PICKER");
+            timePicker.show(getChildFragmentManager(), "TIME_PICKER");
         });
     }
 
@@ -227,13 +233,16 @@ public class SettingsFragment extends Fragment {
     }
 
     private void showResetConfirmation() {
-        new MaterialAlertDialogBuilder(requireContext())
+        Context context = getContext();
+        if (context == null) return;
+
+        new MaterialAlertDialogBuilder(context)
                 .setTitle(R.string.dialog_reset_title)
                 .setMessage(R.string.dialog_reset_message)
                 .setPositiveButton(R.string.dialog_reset_positive, (dialog, which) -> {
                     viewModel.deleteAllTransactions(() -> {
                         if (isAdded() && getActivity() != null) {
-                            Toast.makeText(requireContext(), R.string.msg_data_cleared, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), R.string.msg_data_cleared, Toast.LENGTH_SHORT).show();
                             requireActivity().recreate();
                         }
                     });

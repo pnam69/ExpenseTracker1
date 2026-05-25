@@ -15,6 +15,7 @@ public final class AppSettings {
     private static final String KEY_EMERGENCY_GOAL = "emergency_goal";
     private static final String KEY_USER_NAME = "user_name";
     private static final String KEY_USER_EMAIL = "user_email";
+    private static final String KEY_NOTIFICATIONS_ENABLED = "notifications_enabled";
 
     public static final String DEFAULT_CURRENCY_LABEL = "Việt Nam Đồng (VND)";
     public static final String DEFAULT_CURRENCY_SYMBOL = "đ";
@@ -34,6 +35,14 @@ public final class AppSettings {
 
     public static void setDarkModeEnabled(Context context, boolean enabled) {
         prefs(context).edit().putBoolean(KEY_DARK_MODE, enabled).apply();
+    }
+
+    public static boolean isNotificationsEnabled(Context context) {
+        return prefs(context).getBoolean(KEY_NOTIFICATIONS_ENABLED, true);
+    }
+
+    public static void setNotificationsEnabled(Context context, boolean enabled) {
+        prefs(context).edit().putBoolean(KEY_NOTIFICATIONS_ENABLED, enabled).apply();
     }
 
     public static String getCurrencyLabel(Context context) {

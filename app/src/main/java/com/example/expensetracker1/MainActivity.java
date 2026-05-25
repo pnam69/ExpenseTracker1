@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
             tx.add(R.id.nav_host_fragment, target, tag);
         }
 
-        tx.setPrimaryNavigationFragment(target).commit();
+        tx.setPrimaryNavigationFragment(target).commitAllowingStateLoss();
     }
 
     private Fragment createFragmentForMenu(int menuItemId) {

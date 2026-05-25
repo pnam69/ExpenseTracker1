@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Build;
 import androidx.core.app.NotificationCompat;
+import com.example.expensetracker1.util.AppSettings;
 
 public class NotificationHelper {
 
@@ -33,6 +34,7 @@ public class NotificationHelper {
 
     // 1. Phát thông báo khi người dùng thêm KHOẢN CHI
     public static void sendExpenseNotification(Context context, double soTienChi, String tenKhoanChi) {
+        if (!AppSettings.isNotificationsEnabled(context)) return;
         createNotificationChannel(context);
 
         String soTienChu = (soTienChi == (long) soTienChi) ? String.valueOf((long) soTienChi) : String.format("%,.0f", soTienChi);
@@ -54,6 +56,7 @@ public class NotificationHelper {
 
     // 2. ĐÃ SỬA: Phát thông báo CẢNH BÁO nếu hết tiền (bằng 0) hoặc âm tiền (vượt mốc)
     public static void checkAndSendBudgetNotification(Context context, double hanMucConLai) {
+        if (!AppSettings.isNotificationsEnabled(context)) return;
         createNotificationChannel(context);
 
         String title;
@@ -91,6 +94,7 @@ public class NotificationHelper {
 
     // 3. Phát thông báo khi người dùng thêm KHOẢN THU
     public static void sendIncomeNotification(Context context, double soTienThu, String tenKhoanThu) {
+        if (!AppSettings.isNotificationsEnabled(context)) return;
         createNotificationChannel(context);
 
         String title = "Tiền về! 🎉";
@@ -112,6 +116,7 @@ public class NotificationHelper {
 
     // 4. Thông báo tổng kết tài chính cuối ngày (WorkManager)
     public static void sendDailySummaryNotification(Context context, String title, String message) {
+        if (!AppSettings.isNotificationsEnabled(context)) return;
         createNotificationChannel(context);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)

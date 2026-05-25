@@ -70,11 +70,15 @@ public class AddTransactionActivity extends AppCompatActivity {
                     .build();
 
             datePicker.addOnPositiveButtonClickListener(selection -> {
-                transactionDate = selection;
-                updateDateDisplay();
+                if (selection != null) {
+                    transactionDate = selection;
+                    updateDateDisplay();
+                }
             });
 
-            datePicker.show(getSupportFragmentManager(), "DATE_PICKER");
+            if (!getSupportFragmentManager().isStateSaved()) {
+                datePicker.show(getSupportFragmentManager(), "DATE_PICKER");
+            }
         });
     }
 

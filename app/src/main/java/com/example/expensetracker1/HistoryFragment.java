@@ -181,10 +181,11 @@ public class HistoryFragment extends Fragment {
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getBindingAdapterPosition();
-                Transaction transaction = adapter.getTransactionAt(position);
-                showDeleteDialog(transaction);
-                // Need to notify adapter to restore the item if user cancels, or just refresh
-                adapter.notifyItemChanged(position);
+                if (position != RecyclerView.NO_POSITION) {
+                    Transaction transaction = adapter.getTransactionAt(position);
+                    showDeleteDialog(transaction);
+                    adapter.notifyItemChanged(position);
+                }
             }
         }).attachToRecyclerView(binding.rvHistory);
     }
